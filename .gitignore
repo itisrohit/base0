@@ -1,0 +1,70 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Testing
+coverage
+.nyc_output
+
+# Build Outputs
+dist
+build
+out
+_site
+lib-cov
+
+# Runtime Data & Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.npm
+
+# Environment Variables
+.env
+.env.production
+.env.development
+.env.local
+.env.*.local
+!.env.example
+
+# Editor Directories and Files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Framework Specific (Next.js / Vite / etc)
+.next/
+.nuxt/
+.cache/
+.parcel-cache
+.turbo/
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# Bun
+.bun/
+
+# OS Generated Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Temporary
+tmp/
+temp/
