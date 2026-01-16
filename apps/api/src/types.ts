@@ -10,6 +10,7 @@ export interface AuthVariables {
     keyId?: string; // Present for API Key auth
     authType: 'jwt' | 'apiKey';
     scopes?: string[]; // For API Keys
+    role?: string; // User role in current project
   };
   collection?: Collection;
 }
