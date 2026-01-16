@@ -1,5 +1,5 @@
 import { db } from '@base0/db';
-import { buckets, files, projects } from '@base0/db/schema';
+import { buckets, files, projectMembers } from '@base0/db/schema';
 import { zValidator } from '@hono/zod-validator';
 import { and, eq } from 'drizzle-orm';
 import { type Context, Hono, type Next } from 'hono';
@@ -24,13 +24,18 @@ const createBucketSchema = z.object({
  */
 const checkProjectAccess = async (c: Context<{ Variables: AuthVariables }>, next: Next) => {
   const auth = getAuthContext(c);
-  // Support both body and param for projectId
-  const body = (await c.req.parseBody().catch(() => ({}))) as Record<string, unknown>;
-  const json = (await c.req.json().catch(() => ({}))) as Record<string, unknown>;
-  const projectId =
-    (c.req.param('projectId') as string | undefined) ||
-    (json.projectId as string | undefined) ||
-    (body.projectId as string | undefined);
+  let projectId = c.req.param('projectId') || c.req.query('projectId');
+
+  if (!projectId && c.req.method !== 'GET') {
+    const contentType = c.req.header('content-type');
+    if (contentType?.includes('application/json')) {
+      const json = (await c.req.json().catch(() => ({}))) as Record<string, unknown>;
+      projectId = json.projectId as string | undefined;
+    } else if (contentType?.includes('multipart/form-data')) {
+      const body = (await c.req.parseBody().catch(() => ({}))) as Record<string, unknown>;
+      projectId = body.projectId as string | undefined;
+    }
+  }
 
   if (!projectId) {
     return c.json({ error: 'Project ID is required' }, 400);
@@ -41,13 +46,15 @@ const checkProjectAccess = async (c: Context<{ Variables: AuthVariables }>, next
       return c.json({ error: 'Unauthorized: API Key is not valid for this project' }, 403);
     }
   } else {
-    const [project] = await db
+    const [membership] = await db
       .select()
-      .from(projects)
-      .where(and(eq(projects.id, projectId), eq(projects.ownerId, auth.userId ?? '')))
+      .from(projectMembers)
+      .where(
+        and(eq(projectMembers.projectId, projectId), eq(projectMembers.userId, auth.userId ?? '')),
+      )
       .limit(1);
 
-    if (!project) {
+    if (!membership) {
       return c.json({ error: 'Project not found or unauthorized' }, 404);
     }
   }
@@ -137,6 +144,23 @@ storage.post('/buckets/:bucketId/files', authMiddleware, async (c) => {
 });
 
 /**
+ * GET /v1/storage/buckets/:bucketId/files
+ * List all files in a bucket
+ */
+storage.get('/buckets/:bucketId/files', authMiddleware, async (c) => {
+  const bucketId = c.req.param('bucketId');
+
+  const [bucket] = await db.select().from(buckets).where(eq(buckets.id, bucketId)).limit(1);
+
+  if (!bucket) {
+    return c.json({ error: 'Bucket not found' }, 404);
+  }
+
+  const results = await db.select().from(files).where(eq(files.bucketId, bucketId));
+  return c.json({ files: results });
+});
+
+/**
  * GET /v1/storage/buckets/:bucketId/files/:fileId/view
  * View/Download a file
  */
@@ -158,6 +182,53 @@ storage.get('/buckets/:bucketId/files/:fileId/view', async (c) => {
     console.error('Download error:', error);
     return c.json({ error: 'Failed to retrieve file' }, 500);
   }
+});
+
+/**
+ * DELETE /v1/storage/buckets/:bucketId/files/:fileId
+ * Delete a file
+ */
+storage.delete('/buckets/:bucketId/files/:fileId', authMiddleware, async (c) => {
+  const { bucketId, fileId } = c.req.param();
+
+  const [fileDoc] = await db
+    .select()
+    .from(files)
+    .where(and(eq(files.id, fileId), eq(files.bucketId, bucketId)))
+    .limit(1);
+
+  if (!fileDoc) return c.json({ error: 'File not found' }, 404);
+
+  try {
+    const storageProvider = await getStorageProvider();
+    await storageProvider.delete(fileDoc.path);
+
+    await db.delete(files).where(eq(files.id, fileId));
+
+    return c.json({ message: 'File deleted successfully' });
+  } catch (error) {
+    console.error('Delete error:', error);
+    return c.json({ error: 'Failed to delete file' }, 500);
+  }
+});
+
+/**
+ * DELETE /v1/storage/buckets/:bucketId
+ * Delete a storage bucket
+ */
+storage.delete('/buckets/:bucketId', authMiddleware, checkProjectAccess, async (c) => {
+  const { bucketId } = c.req.param();
+
+  // Check if bucket has files
+  const existingFiles = await db.select().from(files).where(eq(files.bucketId, bucketId)).limit(1);
+
+  if (existingFiles.length > 0) {
+    return c.json({ error: 'Cannot delete bucket with files. Delete all files first.' }, 400);
+  }
+
+  await db.delete(buckets).where(eq(buckets.id, bucketId));
+
+  return c.json({ message: 'Bucket deleted successfully' });
 });
 
 export default storage;
