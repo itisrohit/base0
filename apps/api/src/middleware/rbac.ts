@@ -1,5 +1,5 @@
 import { db } from '@base0/db';
-import { collections, projectMembers } from '@base0/db/schema';
+import { collections, projectMembers, projects } from '@base0/db/schema';
 import { and, eq } from 'drizzle-orm';
 import type { Context, Next } from 'hono';
 import {
@@ -68,6 +68,16 @@ export const requirePermission = (permission: Permission) => {
       .limit(1);
 
     if (!member) {
+      // Check if project exists to provide a better error (404 instead of 403)
+      const [project] = await db
+        .select({ id: projects.id })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .limit(1);
+
+      if (!project) {
+        return c.json({ error: 'Project not found' }, 404);
+      }
       return c.json({ error: 'Forbidden: You are not a member of this project' }, 403);
     }
 
