@@ -8,6 +8,7 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "type-check": "turbo run type-check",
+    "test": "turbo run test",
     "check": "biome check .",
     "check:apply": "biome check --write .",
     "docker:build": "docker-compose build",
