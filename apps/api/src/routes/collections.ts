@@ -29,28 +29,40 @@ const createCollectionSchema = z.object({
   permissions: z.record(z.unknown()).optional().default({}),
 });
 
+import { getAuthContext } from '../middleware/auth';
+
 /**
  * Middleware to check project ownership
  */
 const checkProjectOwnership = async (c: Context<{ Variables: AuthVariables }>, next: Next) => {
-  const { userId } = getAuthUser(c);
+  const auth = getAuthContext(c);
+
   // Support both body and param for projectId
   const body = (await c.req.parseBody().catch(() => ({}))) as Record<string, unknown>;
   const json = (await c.req.json().catch(() => ({}))) as Record<string, unknown>;
 
-  const projectId =
+  const requestedProjectId =
     c.req.param('projectId') ||
     (json.projectId as string | undefined) ||
     (body.projectId as string | undefined);
 
-  if (!projectId) {
+  if (!requestedProjectId) {
     return c.json({ error: 'Project ID is required' }, 400);
   }
 
+  // 1. If API Key, check if it matches the key's proyecto
+  if (auth.authType === 'apiKey') {
+    if (auth.projectId !== requestedProjectId) {
+      return c.json({ error: 'Unauthorized: API Key is not valid for this project' }, 403);
+    }
+    return next();
+  }
+
+  // 2. If JWT, check if user owns the project
   const [project] = await db
     .select()
     .from(projects)
-    .where(and(eq(projects.id, projectId), eq(projects.ownerId, userId)))
+    .where(and(eq(projects.id, requestedProjectId), eq(projects.ownerId, auth.userId ?? '')))
     .limit(1);
 
   if (!project) {

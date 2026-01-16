@@ -7,8 +7,9 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { generateAccessToken, generateRefreshToken, verifyToken } from '../lib/jwt';
 import { authMiddleware, getAuthUser } from '../middleware/auth';
+import type { AuthVariables } from '../types';
 
-const auth = new Hono();
+const auth = new Hono<{ Variables: AuthVariables }>();
 
 // Validation schemas
 const signupSchema = z.object({
