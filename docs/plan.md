@@ -28,35 +28,35 @@ Target audience: **Senior engineers & modern product teams**.
 ## Core Features (v1)
 
 ### 1. Authentication (Zero-Trust)
-*   Email + Magic Link / Passwordless (Modern default)
-*   Traditional Email/Password (Argon2id)
-*   OIDC / OAuth2 Pluggable Interface
-*   Rotating JWTs with sliding sessions across edge nodes
-*   Turnkey Middleware for route protection
+*   ✅ **Traditional Email/Password (Argon2id)** - Implemented
+*   ✅ **JWT Sessions** - Implemented with Access/Refresh tokens
+*   ✅ **Auth Middleware** - Implemented for route protection
+*   🔄 Magic Link / Passwordless - Planned
+*   🔄 OIDC / OAuth2 Pluggable Interface - Planned
 
 ### 2. Data Engine (Collections)
-*   Dynamic schema definition
-*   High-performance CRUD via JSON methods
-*   Filtering engine (eq, lt, gt, contains)
-*   Automated `created_at` / `updated_at` traces
-*   Optional multi-tenancy (logical isolation)
+*   ✅ **Dynamic Schema Definition** - Implemented via JSONB
+*   ✅ **Dynamic Validation** - Implemented with runtime Zod engine
+*   ✅ **CRUD API** - Implemented for Collections and Documents
+*   ✅ **Multi-tenancy** - Implemented via Projects logical isolation
+*   🔄 Filtering Engine (eq, lt, gt, contains) - In Progress
 
 ### 3. Blob Storage
-*   S3-compatible interface abstraction
-*   Smart metadata tagging
-*   Presigned URL generation for direct-to-cloud uploads
-*   MIME-type sniffing and strict validation
+*   🔄 S3-compatible interface abstraction - Planned
+*   🔄 Smart metadata tagging - Planned
+*   🔄 Presigned URL generation - Planned
 
 ### 4. Access Control (IAM)
-*   Scoped API Keys (Read/Write/Admin)
-*   Granular Role-Based Access Control (RBAC)
-*   Per-request computational metering (Rate Limiting)
+*   ✅ **API Key Provisioning** - Implemented
+*   🔄 API Key Auth Middleware - In Progress
+*   🔄 Scoped Permissions (Read/Write/Admin) - Planned
+*   🔄 Rate Limiting - Planned
 
 ### 5. Mission Control (Dashboard)
-*   Visual Data Explorer
-*   User & Session Management
-*   Storage Browser
-*   Real-time usage telemetry
+*   🔄 Visual Data Explorer - Planned (Phase 3)
+*   🔄 User & Session Management - Planned
+*   🔄 Storage Browser - Planned
+*   🔄 Usage Telemetry - Planned
 
 ---
 
@@ -148,21 +148,31 @@ Target audience: **Senior engineers & modern product teams**.
   - Auth routes: signup, login, refresh, me
   - Zod validation for all inputs
 
-### Phase 2: Core Logic 🚧 IN PROGRESS
-*   🔄 Generic Collection CRUD API - **NEXT**
-*   Dynamic JSON validation based on collection schema
-*   API Key middleware & security headers
+### Phase 3: Extended Primitives 🚧 IN PROGRESS
+*   🔄 API Key Auth Middleware (`X-API-Key` support) - **NEXT**
+*   🔄 Document Filtering Engine (Advanced JSONB queries)
+*   🔄 Blob Storage System (S3-compatible abstraction)
+*   🔄 File Upload/Download API with presigned URLs
+*   🔄 Scoped Permissions & IAM (RBAC)
 
-### Phase 3: Frontend Implementation
+**Planned Items:**
+- **Storage Driver**: Abstracted interface for Local/S3/Minio
+- **Query Parser**: Transform URL query params into PostgreSQL JSONB operations
+- **Middleware**: Unified auth (JWT or API Key) for all endpoints
+- **Rate Limiting**: Per-key based computational metering
+
+### Phase 4: Mission Control (Frontend)
 *   React 19 Dashboard setup
 *   TanStack Router implementation
-*   Data visualization for collections
-*   File upload widgets
+*   Schema Designer (Visual UI for collections)
+*   Visual Data Explorer
+*   API Key Management UI
 
-### Phase 4: Refinement & QA
-*   Docs generation (OpenAPI/Swagger)
+### Phase 5: Refinement & QA
+*   OpenAPI / Swagger documentation auto-generation
 *   Integration tests (Vitest)
-*   Docker Compose production readiness checks
+*   Docker Compose production readiness checks (SSL, persistence)
+*   Deployment guides (Fly.io / Vercel / Railway)
 
 ---
 
