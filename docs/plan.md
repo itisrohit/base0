@@ -122,7 +122,7 @@ This project demonstrates:
 *   `id`
 *   `collection_id`
 *   `data` (jsonb)
-*   `vector_embedding` (optional, for AI search)
+*   `vector_embedding` (placeholder for future AI search)
 *   `created_at`
 
 #### `buckets`
