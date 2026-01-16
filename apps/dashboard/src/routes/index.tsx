@@ -82,7 +82,7 @@ function ProjectsDashboard() {
         {projects?.map((project) => (
           <Link
             key={project.id}
-            to="/projects/$projectId/keys"
+            to="/projects/$projectId/collections"
             params={{ projectId: project.id }}
             className="border border-border rounded-lg p-6 bg-card hover:border-primary transition-colors block"
           >
