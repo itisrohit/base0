@@ -1,0 +1,23 @@
+{
+  "name": "base0-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "format": "turbo format",
+    "type-check": "turbo run type-check",
+    "check": "biome check .",
+    "check:apply": "biome check --write ."
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "turbo": "latest",
+    "@biomejs/biome": "latest",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "bun@1.2.16"
+}
