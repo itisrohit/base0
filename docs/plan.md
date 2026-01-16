@@ -51,7 +51,8 @@ Target audience: **Senior engineers & modern product teams**.
 *   ✅ **Unified Auth Middleware** - Implemented (JWT + API Key support)
 *   ✅ **Granular RBAC** - Implemented (Owner, Admin, Member, Viewer)
 *   ✅ **Member Management** - Implemented (Invite/Remove flow)
-*   🔄 Rate Limiting - Planned
+*   ✅ **Rate Limiting** - Implemented (In-memory, protective primitive)
+*   ✅ **S3 Storage Driver** - Implemented (Compatible with MinIO/R2)
 
 ### 5. Mission Control (Dashboard)
 *   🔄 Visual Data Explorer - Planned (Phase 3)
@@ -179,10 +180,9 @@ Target audience: **Senior engineers & modern product teams**.
 *   ✅ **Scoped RBAC**: Enforcing granular roles (Owner, Admin, Member, Viewer) - Implemented
 *   ✅ **Member Management**: Invite/Remove flow for projects - Implemented
 
-**Next focus: Advanced Management & Frontend**
-*   🔄 **API Key Scopes**: Restricting keys to specific operations (Read-only, Write-only) - Planned
-*   🔄 **S3 Storage Driver**: AWS S3/Minio compatibility layer - Planned
-*   🔄 **Rate Limiting**: Base computational metering per project/key - Planned
+*   ✅ **API Key Scopes**: Restricting keys to specific operations (Read-only, Write-only) - Implemented
+*   ✅ **S3 Storage Driver**: AWS S3/Minio compatibility layer - Implemented
+*   ✅ **Rate Limiting**: Base computational metering per project/key - Implemented
 
 ### Phase 4: Mission Control (Frontend)
 *   React 19 Dashboard setup
