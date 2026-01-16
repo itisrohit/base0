@@ -89,16 +89,16 @@ function UsagePage() {
               <AreaChart data={usage.requests}>
                 <defs>
                   <linearGradient id="colorRequests" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                 <XAxis
                   dataKey="date"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+                  tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
                   dy={10}
                   tickFormatter={(str) => {
                     const date = new Date(str);
@@ -108,21 +108,23 @@ function UsagePage() {
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+                  tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'var(--card)',
-                    borderColor: 'var(--border)',
+                    backgroundColor: 'hsl(var(--card))',
+                    borderColor: 'hsl(var(--border))',
                     borderRadius: '8px',
                     fontSize: '12px',
+                    color: 'hsl(var(--foreground))',
                   }}
-                  cursor={{ stroke: 'var(--primary)', strokeWidth: 1 }}
+                  itemStyle={{ color: 'hsl(var(--primary))' }}
+                  cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1 }}
                 />
                 <Area
                   type="monotone"
                   dataKey="count"
-                  stroke="var(--primary)"
+                  stroke="hsl(var(--primary))"
                   fillOpacity={1}
                   fill="url(#colorRequests)"
                   strokeWidth={2}
@@ -138,12 +140,12 @@ function UsagePage() {
           <div className="w-full aspect-[2/1] min-h-[300px]">
             <ResponsiveContainer width="99%" height="100%">
               <BarChart data={usage.requests}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                 <XAxis
                   dataKey="date"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+                  tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
                   dy={10}
                   tickFormatter={(str) => {
                     const date = new Date(str);
@@ -153,18 +155,25 @@ function UsagePage() {
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+                  tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'var(--card)',
-                    borderColor: 'var(--border)',
+                    backgroundColor: 'hsl(var(--card))',
+                    borderColor: 'hsl(var(--border))',
                     borderRadius: '8px',
                     fontSize: '12px',
+                    color: 'hsl(var(--foreground))',
                   }}
-                  cursor={{ fill: 'var(--muted)', opacity: 0.4 }}
+                  itemStyle={{ color: 'hsl(var(--primary))' }}
+                  cursor={{ fill: 'hsl(var(--muted))', opacity: 0.4 }}
                 />
-                <Bar dataKey="count" fill="var(--primary)" radius={[4, 4, 0, 0]} barSize={32} />
+                <Bar
+                  dataKey="count"
+                  fill="hsl(var(--primary))"
+                  radius={[4, 4, 0, 0]}
+                  barSize={32}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
