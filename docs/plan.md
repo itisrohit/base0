@@ -11,8 +11,6 @@ This project demonstrates:
 *   **End-to-End Type Safety**: 100% shared types between client and server.
 *   **Minimalist System Design**: High leverage with zero "magic".
 
-Target audience: **Senior engineers & modern product teams**.
-
 ---
 
 ## Design Philosophy
@@ -21,42 +19,42 @@ Target audience: **Senior engineers & modern product teams**.
 *   **Standards over Frameworks**: Use Web Standards (Request/Response) everywhere.
 *   **Type-Safe or Bust**: If it's not typed, it doesn't exist.
 *   **Local-First DX**: The dev environment matches production perfectly.
-*   **AI-Ready Codebase**: Code is structured to be easily parsed and extended by LLMs.
 
 ---
 
 ## Core Features (v1)
 
 ### 1. Authentication (Zero-Trust)
-*   Email + Magic Link / Passwordless (Modern default)
-*   Traditional Email/Password (Argon2id)
-*   OIDC / OAuth2 Pluggable Interface
-*   Rotating JWTs with sliding sessions across edge nodes
-*   Turnkey Middleware for route protection
+*   ✅ **Traditional Email/Password (Argon2id)** - Implemented
+*   ✅ **JWT Sessions** - Implemented with Access/Refresh tokens
+*   ✅ **Auth Middleware** - Implemented for route protection
+*   ✅ **Magic Link** - Implemented
 
 ### 2. Data Engine (Collections)
-*   Dynamic schema definition
-*   High-performance CRUD via JSON methods
-*   Filtering engine (eq, lt, gt, contains)
-*   Automated `created_at` / `updated_at` traces
-*   Optional multi-tenancy (logical isolation)
+*   ✅ **Dynamic Schema Definition** - Implemented via JSONB
+*   ✅ **Dynamic Validation** - Implemented with runtime Zod engine
+*   ✅ **CRUD API** - Implemented for Collections and Documents
+*   ✅ **Multi-tenancy** - Implemented via Projects logical isolation
+*   ✅ **Filtering Engine (eq, lt, gt, contains)** - Implemented with PostgreSQL JSONB
 
 ### 3. Blob Storage
-*   S3-compatible interface abstraction
-*   Smart metadata tagging
-*   Presigned URL generation for direct-to-cloud uploads
-*   MIME-type sniffing and strict validation
+*   ✅ **Pluggable Architecture** - Implemented (Local/S3 Abstraction)
+*   ✅ **File Metadata & Tracking** - Implemented in database
+*   ✅ **Secure Upload/Download** - Implemented with stream support
 
 ### 4. Access Control (IAM)
-*   Scoped API Keys (Read/Write/Admin)
-*   Granular Role-Based Access Control (RBAC)
-*   Per-request computational metering (Rate Limiting)
+*   ✅ **API Key Provisioning** - Implemented
+*   ✅ **Unified Auth Middleware** - Implemented (JWT + API Key support)
+*   ✅ **Granular RBAC** - Implemented (Owner, Admin, Member, Viewer)
+*   ✅ **Member Management** - Implemented (Invite/Remove flow)
+*   ✅ **Rate Limiting** - Implemented (In-memory, protective primitive)
+*   ✅ **S3 Storage Driver** - Implemented (Compatible with MinIO/R2)
 
 ### 5. Mission Control (Dashboard)
-*   Visual Data Explorer
-*   User & Session Management
-*   Storage Browser
-*   Real-time usage telemetry
+*   🔄 Visual Data Explorer - Planned (Phase 3)
+*   🔄 User & Session Management - Planned
+*   🔄 Storage Browser - Planned
+*   🔄 Usage Telemetry - Planned
 
 ---
 
@@ -102,10 +100,17 @@ Target audience: **Senior engineers & modern product teams**.
 *   `config` (jsonb)
 
 #### `api_keys`
-*   `id`
-*   `key_hash` (never store raw)
+*   `id` (uuid)
+*   `key_id` (nanoId - public identifier)
+*   `key_hash` (argon2 hashed secret)
 *   `project_id`
 *   `scopes` (text[])
+
+#### `project_members`
+*   `id` (uuid)
+*   `project_id`
+*   `user_id`
+*   `role` (owner, admin, member, viewer)
 
 #### `collections`
 *   `id`
@@ -117,8 +122,35 @@ Target audience: **Senior engineers & modern product teams**.
 *   `id`
 *   `collection_id`
 *   `data` (jsonb)
-*   `vector_embedding` (optional, for AI search)
+*   `vector_embedding` (placeholder for future AI search)
 *   `created_at`
+
+#### `buckets`
+*   `id` (uuid)
+*   `project_id`
+*   `name`
+*   `config` (jsonb)
+
+#### `files`
+*   `id` (uuid)
+*   `bucket_id`
+*   `name`
+*   `path` (storage path)
+*   `size`
+*   `mime_type`
+
+#### `magic_links`
+*   `id` (uuid)
+*   `token_hash` (unique index)
+*   `user_email`
+*   `expires_at`
+*   `used` (boolean)
+
+#### `oauth_accounts`
+*   `id` (uuid)
+*   `provider` (text: 'github', 'google')
+*   `provider_user_id`
+*   `user_id` (fk -> users)
 
 ---
 
@@ -148,21 +180,35 @@ Target audience: **Senior engineers & modern product teams**.
   - Auth routes: signup, login, refresh, me
   - Zod validation for all inputs
 
-### Phase 2: Core Logic 🚧 IN PROGRESS
-*   🔄 Generic Collection CRUD API - **NEXT**
-*   Dynamic JSON validation based on collection schema
-*   API Key middleware & security headers
+### Phase 3: Extended Primitives ✅ COMPLETED (Core)
+*   ✅ **Unified Auth Middleware**: Support for both JWT (User Sessions) and API Keys (b0_...) - Implemented
+*   ✅ **Document Filtering Engine**: Advanced JSONB querying with operators (`eq`, `gt`, `contains`, `in`, etc.) - Implemented
+*   ✅ **Blob Storage System**: Plug-and-play storage architecture with Local driver support - Implemented
+*   ✅ **File Storage API**: Secure bucket management, file uploads (with metadata), and streaming downloads - Implemented
+*   ✅ **Permissions Foundation**: Schema support for multi-member projects and RBAC - Implemented
+*   ✅ **Scoped RBAC**: Enforcing granular roles (Owner, Admin, Member, Viewer) - Implemented
+*   ✅ **Member Management**: Invite/Remove flow for projects - Implemented
 
-### Phase 3: Frontend Implementation
+*   ✅ **API Key Scopes**: Restricting keys to specific operations (Read-only, Write-only) - Implemented
+*   ✅ **S3 Storage Driver**: AWS S3/Minio compatibility layer - Implemented
+*   ✅ **Rate Limiting**: Base computational metering per project/key - Implemented
+
+### Phase 3.5: Advanced Authentication ✅ COMPLETED
+*   ✅ **Magic Link / Passwordless**: Secure email-based login (Arctic + Custom Table) - Implemented
+*   ✅ **OIDC / OAuth2 Pluggable Interface**: GitHub/Google login flow (Arctic) - Implemented
+
+### Phase 4: Mission Control (Frontend)
 *   React 19 Dashboard setup
 *   TanStack Router implementation
-*   Data visualization for collections
-*   File upload widgets
+*   Schema Designer (Visual UI for collections)
+*   Visual Data Explorer
+*   API Key Management UI
 
-### Phase 4: Refinement & QA
-*   Docs generation (OpenAPI/Swagger)
+### Phase 5: Refinement & QA
+*   OpenAPI / Swagger documentation auto-generation
 *   Integration tests (Vitest)
-*   Docker Compose production readiness checks
+*   Docker Compose production readiness checks (SSL, persistence)
+*   Deployment guides (Fly.io / Vercel / Railway)
 
 ---
 
