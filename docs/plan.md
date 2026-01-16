@@ -203,10 +203,10 @@ This project demonstrates:
 *   ✅ **Authentication Integration**: Magic Link and OAuth flow with protected routes - Implemented
 *   ✅ **API Key Management UI**: Create, view, and revoke API keys with scope control - Implemented
 *   ✅ **Projects Management UI**: List and create projects with role-based access - Implemented
-*   Schema Designer (Visual UI for collections)
-*   Visual Data Explorer
+*   ✅ **Schema Designer**: Visual UI for designing collections and fields - Implemented
+*   ✅ **Visual Data Explorer**: Visual UI for CRUD operations on collection data - Implemented
 
-### Phase 5: Refinement & QA
+### Phase 5: Refinement & QA (Next)
 *   OpenAPI / Swagger documentation auto-generation
 *   Integration tests (Vitest)
 *   Docker Compose production readiness checks (SSL, persistence)
