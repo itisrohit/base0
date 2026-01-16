@@ -11,8 +11,6 @@ This project demonstrates:
 *   **End-to-End Type Safety**: 100% shared types between client and server.
 *   **Minimalist System Design**: High leverage with zero "magic".
 
-Target audience: **Senior engineers & modern product teams**.
-
 ---
 
 ## Design Philosophy
@@ -21,7 +19,6 @@ Target audience: **Senior engineers & modern product teams**.
 *   **Standards over Frameworks**: Use Web Standards (Request/Response) everywhere.
 *   **Type-Safe or Bust**: If it's not typed, it doesn't exist.
 *   **Local-First DX**: The dev environment matches production perfectly.
-*   **AI-Ready Codebase**: Code is structured to be easily parsed and extended by LLMs.
 
 ---
 
@@ -31,7 +28,7 @@ Target audience: **Senior engineers & modern product teams**.
 *   ✅ **Traditional Email/Password (Argon2id)** - Implemented
 *   ✅ **JWT Sessions** - Implemented with Access/Refresh tokens
 *   ✅ **Auth Middleware** - Implemented for route protection
-*   👇 *Advanced Auth moved to Phase 3.5*
+*   ✅ **Magic Link** - Implemented
 
 ### 2. Data Engine (Collections)
 *   ✅ **Dynamic Schema Definition** - Implemented via JSONB
@@ -142,6 +139,19 @@ Target audience: **Senior engineers & modern product teams**.
 *   `size`
 *   `mime_type`
 
+#### `magic_links`
+*   `id` (uuid)
+*   `token_hash` (unique index)
+*   `user_email`
+*   `expires_at`
+*   `used` (boolean)
+
+#### `oauth_accounts`
+*   `id` (uuid)
+*   `provider` (text: 'github', 'google')
+*   `provider_user_id`
+*   `user_id` (fk -> users)
+
 ---
 
 ## Development Roadmap
@@ -183,9 +193,9 @@ Target audience: **Senior engineers & modern product teams**.
 *   ✅ **S3 Storage Driver**: AWS S3/Minio compatibility layer - Implemented
 *   ✅ **Rate Limiting**: Base computational metering per project/key - Implemented
 
-### Phase 3.5: Advanced Authentication (In Progress)
-*   ⬜ **Magic Link / Passwordless**: Secure email-based login (Arctic + Custom Table)
-*   ⬜ **OIDC / OAuth2 Pluggable Interface**: GitHub/Google login flow (Arctic)
+### Phase 3.5: Advanced Authentication ✅ COMPLETED
+*   ✅ **Magic Link / Passwordless**: Secure email-based login (Arctic + Custom Table) - Implemented
+*   ✅ **OIDC / OAuth2 Pluggable Interface**: GitHub/Google login flow (Arctic) - Implemented
 
 ### Phase 4: Mission Control (Frontend)
 *   React 19 Dashboard setup
