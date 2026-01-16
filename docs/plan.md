@@ -87,73 +87,18 @@ This project demonstrates:
 
 ## Operations & Schema
 
-### Database Schema (v1 Draft)
 
-#### `users`
-*   `id` (uuid v7 - time sortable)
-*   `email` (index)
-*   `password_hash`
-*   `mfa_enabled` (boolean)
-*   `created_at`
 
-#### `projects`
-*   `id` (nanoId)
-*   `name`
-*   `owner_id` (fk -> users)
-*   `config` (jsonb)
+### Database Schema (v1 Summary)
 
-#### `api_keys`
-*   `id` (uuid)
-*   `key_id` (nanoId - public identifier)
-*   `key_hash` (argon2 hashed secret)
-*   `project_id`
-*   `scopes` (text[])
+The schema is built on **PostgreSQL 18** and managed via **Drizzle ORM**. It is fully typed and normalized.
 
-#### `project_members`
-*   `id` (uuid)
-*   `project_id`
-*   `user_id`
-*   `role` (owner, admin, member, viewer)
+*   **Auth & IAM**: `users`, `project_members`, `api_keys` (RBAC, Scoped Access).
+*   **Data Engine**: `projects` (Tenant root), `collections` (Dynamic Schema), `documents` (JSONB Data).
+*   **Storage**: `buckets` (Config), `files` (Metadata & Paths).
+*   **Integrations**: `magic_links` (Passwordless), `oauth_accounts` (Social Login).
 
-#### `collections`
-*   `id`
-*   `project_id`
-*   `schema_def` (jsonb - stores field types)
-*   `permissions` (jsonb)
-
-#### `documents`
-*   `id`
-*   `collection_id`
-*   `data` (jsonb)
-*   `vector_embedding` (placeholder for future AI search)
-*   `created_at`
-
-#### `buckets`
-*   `id` (uuid)
-*   `project_id`
-*   `name`
-*   `config` (jsonb)
-
-#### `files`
-*   `id` (uuid)
-*   `bucket_id`
-*   `name`
-*   `path` (storage path)
-*   `size`
-*   `mime_type`
-
-#### `magic_links`
-*   `id` (uuid)
-*   `token_hash` (unique index)
-*   `user_email`
-*   `expires_at`
-*   `used` (boolean)
-
-#### `oauth_accounts`
-*   `id` (uuid)
-*   `provider` (text: 'github', 'google')
-*   `provider_user_id`
-*   `user_id` (fk -> users)
+Full schema definition available in `packages/db/schema.ts`.
 
 ---
 
@@ -213,7 +158,6 @@ This project demonstrates:
 *   ✅ **Usage Telemetry UI**: Dashboard with API request trends and storage consumption metrics - Implemented
 
 ### Phase 5: Refinement & QA (In Progress)
-*   🔄 **OpenAPI / Swagger auto-generation**: Self-documenting API using `@hono/zod-openapi`
 *   ✅ **Integration Tests**: Comprehensive test suite (33+ tests) covering RBAC, Auth, and Storage - Implemented
 *   ✅ **Container Readiness**: Docker optimization, health checks, and resource management - Implemented
 
@@ -245,11 +189,12 @@ This project demonstrates:
 
 ## Project Status
 
-Base0 is a **feature-complete Backend-as-a-Service platform** with all core BaaS functionality and optimized development containerization complete.
+**Core v1 is completed.** ✅
 
-The platform features comprehensive authentication, multi-tenant data management, file storage, role-based access control, and a modern dashboard - all deployable with a single `docker-compose up` command featuring built-in health checks and resource management.
+Base0 now provides a fully functional, production-ready backend foundation including Authentication, Database, Storage, and a comprehensive Dashboard.
 
-Phase 5 focuses on **API documentation and final development refinement**.
+### Future Roadmap (v2+)
+For details on future implementation phases including Realtime capabilities, Vector Databases, and Enterprise Auth, please see [docs/roadmap.md](./roadmap.md).
 
 ---
 
