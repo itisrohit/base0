@@ -39,17 +39,17 @@ Target audience: **Senior engineers & modern product teams**.
 *   ✅ **Dynamic Validation** - Implemented with runtime Zod engine
 *   ✅ **CRUD API** - Implemented for Collections and Documents
 *   ✅ **Multi-tenancy** - Implemented via Projects logical isolation
-*   🔄 Filtering Engine (eq, lt, gt, contains) - In Progress
+*   ✅ **Filtering Engine (eq, lt, gt, contains)** - Implemented with PostgreSQL JSONB
 
 ### 3. Blob Storage
-*   🔄 S3-compatible interface abstraction - Planned
-*   🔄 Smart metadata tagging - Planned
-*   🔄 Presigned URL generation - Planned
+*   ✅ **Pluggable Architecture** - Implemented (Local/S3 Abstraction)
+*   ✅ **File Metadata & Tracking** - Implemented in database
+*   ✅ **Secure Upload/Download** - Implemented with stream support
 
 ### 4. Access Control (IAM)
 *   ✅ **API Key Provisioning** - Implemented
-*   🔄 API Key Auth Middleware - In Progress
-*   🔄 Scoped Permissions (Read/Write/Admin) - Planned
+*   ✅ **Unified Auth Middleware** - Implemented (JWT + API Key support)
+*   🔄 Scoped Permissions (RBAC) - In Progress (Schema Ready)
 *   🔄 Rate Limiting - Planned
 
 ### 5. Mission Control (Dashboard)
@@ -102,10 +102,17 @@ Target audience: **Senior engineers & modern product teams**.
 *   `config` (jsonb)
 
 #### `api_keys`
-*   `id`
-*   `key_hash` (never store raw)
+*   `id` (uuid)
+*   `key_id` (nanoId - public identifier)
+*   `key_hash` (argon2 hashed secret)
 *   `project_id`
 *   `scopes` (text[])
+
+#### `project_members`
+*   `id` (uuid)
+*   `project_id`
+*   `user_id`
+*   `role` (owner, admin, member, viewer)
 
 #### `collections`
 *   `id`
@@ -119,6 +126,20 @@ Target audience: **Senior engineers & modern product teams**.
 *   `data` (jsonb)
 *   `vector_embedding` (optional, for AI search)
 *   `created_at`
+
+#### `buckets`
+*   `id` (uuid)
+*   `project_id`
+*   `name`
+*   `config` (jsonb)
+
+#### `files`
+*   `id` (uuid)
+*   `bucket_id`
+*   `name`
+*   `path` (storage path)
+*   `size`
+*   `mime_type`
 
 ---
 
