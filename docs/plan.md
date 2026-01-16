@@ -130,7 +130,7 @@ Target audience: **Senior engineers & modern product teams**.
 *   ✅ Implement Zod schemas & Drizzle migrations
 *   ✅ PostgreSQL 18 with Docker Compose
 *   ✅ Database schema pushed and verified
-*   🔄 Basic Auth flows (SignUp / SignIn) - **NEXT**
+*   ✅ Basic Auth flows (SignUp / SignIn)
 
 **Completed Items:**
 - Turborepo monorepo with Bun package manager
@@ -141,9 +141,15 @@ Target audience: **Senior engineers & modern product teams**.
 - `@base0/dashboard` with React 19, Vite 6, Tailwind CSS v4
 - Docker Compose for local PostgreSQL
 - Comprehensive database documentation
+- **Authentication System:**
+  - Argon2id password hashing (Bun built-in)
+  - JWT access & refresh tokens
+  - Auth middleware for route protection
+  - Auth routes: signup, login, refresh, me
+  - Zod validation for all inputs
 
 ### Phase 2: Core Logic 🚧 IN PROGRESS
-*   Generic Collection CRUD API
+*   🔄 Generic Collection CRUD API - **NEXT**
 *   Dynamic JSON validation based on collection schema
 *   API Key middleware & security headers
 
