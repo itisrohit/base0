@@ -16,7 +16,9 @@
     "./auth": "./src/auth.ts"
   },
   "dependencies": {
+    "arctic": "^3.7.0",
     "drizzle-orm": "latest",
+    "oslo": "^1.2.1",
     "postgres": "^3.4.4",
     "zod": "^3.23.8"
   },

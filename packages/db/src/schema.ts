@@ -3,7 +3,7 @@ import { boolean, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-c
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   email: text('email').notNull().unique(),
-  passwordHash: text('password_hash').notNull(),
+  passwordHash: text('password_hash'), // Nullable for passwordless/OAuth users
   mfaEnabled: boolean('mfa_enabled').default(false),
   createdAt: timestamp('created_at').defaultNow(),
 });
@@ -66,5 +66,24 @@ export const files = pgTable('files', {
   mimeType: text('mime_type').notNull(),
   path: text('path').notNull(), // Internal storage path
   metadata: jsonb('metadata').default({}),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const magicLinks = pgTable('magic_links', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  tokenHash: text('token_hash').notNull().unique(),
+  userEmail: text('user_email').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  used: boolean('used').default(false),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const oauthAccounts = pgTable('oauth_accounts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  provider: text('provider').notNull(), // 'github', 'google'
+  providerUserId: text('provider_user_id').notNull(),
+  userId: uuid('user_id')
+    .references(() => users.id)
+    .notNull(),
   createdAt: timestamp('created_at').defaultNow(),
 });
