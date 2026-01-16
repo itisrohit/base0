@@ -1,29 +1,30 @@
 {
-  "name": "base0-monorepo",
-  "private": true,
-  "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "turbo format",
-    "type-check": "turbo run type-check",
-    "check": "biome check .",
-    "check:apply": "biome check --write ."
-  },
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "devDependencies": {
-    "@biomejs/biome": "latest",
-    "@types/jsonwebtoken": "^9.0.10",
-    "turbo": "latest",
-    "typescript": "^5.9.3"
-  },
-  "packageManager": "bun@1.2.16",
-  "dependencies": {
-    "hono": "^4.11.4",
-    "jsonwebtoken": "^9.0.3",
-    "nanoid": "^5.1.6"
-  }
+    "name": "base0-monorepo",
+    "private": true,
+    "scripts": {
+        "build": "turbo build",
+        "dev": "turbo dev",
+        "dashboard": "cd apps/dashboard && bun run dev",
+        "lint": "turbo lint",
+        "format": "turbo format",
+        "type-check": "turbo run type-check",
+        "check": "biome check .",
+        "check:apply": "biome check --write ."
+    },
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "devDependencies": {
+        "@biomejs/biome": "latest",
+        "@types/jsonwebtoken": "^9.0.10",
+        "turbo": "latest",
+        "typescript": "^5.9.3"
+    },
+    "packageManager": "bun@1.2.16",
+    "dependencies": {
+        "hono": "^4.11.4",
+        "jsonwebtoken": "^9.0.3",
+        "nanoid": "^5.1.6"
+    }
 }
