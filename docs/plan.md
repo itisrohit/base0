@@ -213,9 +213,33 @@ This project demonstrates:
 
 ### Phase 5: Refinement & QA (In Progress)
 *   🔄 **OpenAPI / Swagger auto-generation**: Self-documenting API using `@hono/zod-openapi`
-*   🔄 **Integration Tests**: Comprehensive test suite using Vitest and Supertest
+*   ✅ **Integration Tests**: Comprehensive test suite (33+ tests) covering RBAC, Auth, and Storage - Implemented
 *   🔄 **Production Readiness**: Docker optimization, health checks, and security headers
 *   🔄 **Deployment Guides**: Step-by-step instructions for AWS, Fly.io, and self-hosting
+
+---
+
+## Technical Notes & Production Path
+
+### 1. Usage Telemetry
+*   **Current implementation**: The `/usage` endpoint returns high-fidelity **mock telemetry data** (generated on the server) to demonstrate the Recharts visualization capabilities in the dashboard.
+*   **Production Path**: 
+    *   Implement an **Event Collector** middleware (e.g., ClickHouse or TimescaleDB) to record real-time request metrics.
+    *   Integrate with **Prometheus/Grafana** for infrastructure-level monitoring.
+    *   Replace the mock generator in `apps/api/src/routes/usage.ts` with real database aggregations.
+
+### 2. Magic Link Authentication
+*   **Current implementation**: Generates a secure token and logs the **Login URL to the server console**. This allows instant testing without an SMTP server.
+*   **Production Path**:
+    *   Plug in an **Email Provider** (Resend, Postmark, or AWS SES) via the `SMTP` driver.
+    *   Update the `auth/magic-link` route to send real emails instead of console logging.
+
+### 3. GitHub OAuth
+*   **Current implementation**: Uses the **Arctic** library with placeholders for `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`.
+*   **Production Path**:
+    *   Register a "GitHub OAuth App" in GitHub Developer Settings.
+    *   Configure the `.env` file with real production credentials.
+    *   Enable the callback URL pointing to your production domain.
 
 ---
 
