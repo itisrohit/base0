@@ -148,18 +148,19 @@ Target audience: **Senior engineers & modern product teams**.
   - Auth routes: signup, login, refresh, me
   - Zod validation for all inputs
 
-### Phase 3: Extended Primitives 🚧 IN PROGRESS
-*   🔄 API Key Auth Middleware (`X-API-Key` support) - **NEXT**
-*   🔄 Document Filtering Engine (Advanced JSONB queries)
-*   🔄 Blob Storage System (S3-compatible abstraction)
-*   🔄 File Upload/Download API with presigned URLs
-*   🔄 Scoped Permissions & IAM (RBAC)
+### Phase 3: Extended Primitives ✅ COMPLETED (Core)
+*   ✅ **Unified Auth Middleware**: Support for both JWT (User Sessions) and API Keys (b0_...) - Implemented
+*   ✅ **Document Filtering Engine**: Advanced JSONB querying with operators (`eq`, `gt`, `contains`, `in`, etc.) - Implemented
+*   ✅ **Blob Storage System**: Plug-and-play storage architecture with Local driver support - Implemented
+*   ✅ **File Storage API**: Secure bucket management, file uploads (with metadata), and streaming downloads - Implemented
+*   ✅ **Permissions Foundation**: Schema support for multi-member projects and RBAC - Implemented
 
-**Planned Items:**
-- **Storage Driver**: Abstracted interface for Local/S3/Minio
-- **Query Parser**: Transform URL query params into PostgreSQL JSONB operations
-- **Middleware**: Unified auth (JWT or API Key) for all endpoints
-- **Rate Limiting**: Per-key based computational metering
+**Next focus: Refinement & Scoped Permissions**
+- **Scoped RBAC**: Enforcing granular roles (Owner, Admin, Member, Viewer)
+- **API Key Scopes**: Restricting keys to specific operations (Read-only, Write-only)
+- **Member Management**: Invite/Remove flow for projects
+- **S3 Storage Driver**: AWS S3/Minio compatibility layer
+- **Rate Limiting**: Base computational metering per project/key
 
 ### Phase 4: Mission Control (Frontend)
 *   React 19 Dashboard setup
