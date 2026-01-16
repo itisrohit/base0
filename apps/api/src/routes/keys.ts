@@ -16,6 +16,7 @@ const keysRoute = new Hono<{ Variables: AuthVariables }>();
 
 // Validation schema for creating an API key
 const createKeySchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
   scopes: z.array(z.string()).optional().default(['read']),
 });
 
@@ -30,8 +31,11 @@ keysRoute.get('/', authMiddleware, requirePermission('project:read'), async (c) 
     const keys = await db
       .select({
         id: apiKeys.id,
+        name: apiKeys.name,
+        keyId: apiKeys.keyId,
         projectId: apiKeys.projectId,
         scopes: apiKeys.scopes,
+        createdAt: apiKeys.createdAt,
       })
       .from(apiKeys)
       .where(eq(apiKeys.projectId, projectId));
@@ -54,7 +58,7 @@ keysRoute.post(
   requirePermission('project:update'),
   async (c) => {
     const projectId = c.req.param('projectId');
-    const { scopes } = c.req.valid('json');
+    const { name, scopes } = c.req.valid('json');
 
     try {
       // Generate a new API key pair
@@ -68,6 +72,7 @@ keysRoute.post(
       const [newKey] = await db
         .insert(apiKeys)
         .values({
+          name,
           keyId,
           projectId,
           keyHash,
@@ -80,6 +85,7 @@ keysRoute.post(
           message: 'API key created successfully. Store this safely, it will not be shown again.',
           apiKey: rawKey, // Show the raw key once
           id: newKey.id,
+          name: newKey.name,
           keyId: newKey.keyId,
           projectId: newKey.projectId,
           scopes: newKey.scopes,
