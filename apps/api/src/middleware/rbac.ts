@@ -2,7 +2,12 @@ import { db } from '@base0/db';
 import { collections, projectMembers } from '@base0/db/schema';
 import { and, eq } from 'drizzle-orm';
 import type { Context, Next } from 'hono';
-import { hasPermission, type Permission, type Role } from '../config/permissions';
+import {
+  hasPermission,
+  hasScopePermission,
+  type Permission,
+  type Role,
+} from '../config/permissions';
 import type { AuthVariables } from '../types';
 import { getAuthContext } from './auth';
 
@@ -14,13 +19,18 @@ export const requirePermission = (permission: Permission) => {
   return async (c: Context<{ Variables: AuthVariables }>, next: Next) => {
     const auth = getAuthContext(c);
 
-    // 1. If API Key, it currently has full access to its project (will add key-scopes later)
+    // 1. If API Key, check against scopes
     if (auth.authType === 'apiKey') {
-      // For now, API Keys are treated as 'admin' of their project
-      if (hasPermission('admin', permission)) {
+      if (hasScopePermission(auth.scopes || [], permission)) {
         return await next();
       }
-      return c.json({ error: 'Permission denied for this API Key' }, 403);
+      return c.json(
+        {
+          error: `Forbidden: API Key missing required scope for: ${permission}`,
+          scopes: auth.scopes,
+        },
+        403,
+      );
     }
 
     // 2. Resolve Project ID (Check param, query, then try body)
@@ -114,8 +124,10 @@ export const requireResourcePermission = (resourceType: 'collection', permission
       if (auth.projectId !== projectId) {
         return c.json({ error: 'Unauthorized: API Key invalid for this resource' }, 403);
       }
-      if (hasPermission('admin', permission)) return await next();
-      return c.json({ error: 'Permission denied for this API Key' }, 403);
+      if (hasScopePermission(auth.scopes || [], permission)) {
+        return await next();
+      }
+      return c.json({ error: 'Forbidden: API Key missing required scope' }, 403);
     }
 
     // Check user membership
