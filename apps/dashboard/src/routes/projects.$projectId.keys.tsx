@@ -4,10 +4,10 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { ProjectNav } from '@/components/layout/project-nav';
 import { Button } from '@/components/ui/button';
 import { useApiKeys, useCreateApiKey, useRevokeApiKey } from '@/hooks/use-api-keys';
-import { rootRoute } from './__root';
+import { authenticatedLayout } from './_authenticated';
 
 export const projectKeysRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedLayout,
   path: '/projects/$projectId/keys',
   component: () => (
     <DashboardLayout>
@@ -17,7 +17,7 @@ export const projectKeysRoute = createRoute({
 });
 
 function ApiKeysPage() {
-  const { projectId } = useParams({ from: '/projects/$projectId/keys' });
+  const { projectId } = useParams({ from: '/authenticated/projects/$projectId/keys' });
   const { data: keys, isLoading } = useApiKeys(projectId);
   const createKey = useCreateApiKey(projectId);
   const revokeKey = useRevokeApiKey(projectId);

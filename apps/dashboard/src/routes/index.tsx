@@ -4,10 +4,10 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { useCreateProject, useProjects } from '@/hooks/use-projects';
-import { rootRoute } from './__root';
+import { authenticatedLayout } from './_authenticated';
 
 export const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedLayout,
   path: '/',
   component: () => (
     <DashboardLayout>
@@ -17,7 +17,7 @@ export const indexRoute = createRoute({
 });
 
 function ProjectsDashboard() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isLoading: authLoading } = useAuth();
   const { data: projects, isLoading } = useProjects();
   const createProject = useCreateProject();
   const [showCreate, setShowCreate] = useState(false);
@@ -32,18 +32,6 @@ function ProjectsDashboard() {
 
   if (authLoading) {
     return <div className="text-center py-12">Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Base0</h1>
-        <p className="text-muted-foreground mb-8">Please log in to access your projects</p>
-        <Link to="/login">
-          <Button>Go to Login</Button>
-        </Link>
-      </div>
-    );
   }
 
   if (isLoading) {

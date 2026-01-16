@@ -13,10 +13,10 @@ import {
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { ProjectNav } from '@/components/layout/project-nav';
 import { useUsage } from '@/hooks/use-usage';
-import { rootRoute } from './__root';
+import { authenticatedLayout } from './_authenticated';
 
 export const projectUsageRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedLayout,
   path: '/projects/$projectId/usage',
   component: () => (
     <DashboardLayout>
@@ -26,7 +26,7 @@ export const projectUsageRoute = createRoute({
 });
 
 function UsagePage() {
-  const { projectId } = useParams({ from: '/projects/$projectId/usage' });
+  const { projectId } = useParams({ from: '/authenticated/projects/$projectId/usage' });
   const { data: usage, isLoading } = useUsage(projectId);
 
   if (isLoading) return <div className="p-8 text-center">Loading usage metrics...</div>;

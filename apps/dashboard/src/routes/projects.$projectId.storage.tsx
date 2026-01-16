@@ -12,10 +12,10 @@ import {
   useFiles,
   useUploadFile,
 } from '@/hooks/use-storage';
-import { rootRoute } from './__root';
+import { authenticatedLayout } from './_authenticated';
 
 export const projectStorageRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedLayout,
   path: '/projects/$projectId/storage',
   component: () => (
     <DashboardLayout>
@@ -25,7 +25,7 @@ export const projectStorageRoute = createRoute({
 });
 
 function StoragePage() {
-  const { projectId } = useParams({ from: '/projects/$projectId/storage' });
+  const { projectId } = useParams({ from: '/authenticated/projects/$projectId/storage' });
   const { data: buckets, isLoading: bucketsLoading } = useBuckets(projectId);
   const createBucket = useCreateBucket(projectId);
   const deleteBucket = useDeleteBucket(projectId);

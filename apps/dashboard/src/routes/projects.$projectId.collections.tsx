@@ -10,12 +10,12 @@ import {
   useCreateCollection,
   useDeleteCollection,
 } from '@/hooks/use-collections';
-import { rootRoute } from './__root';
+import { authenticatedLayout } from './_authenticated';
 
 const nanoid = customAlphabet('1234567890abcdef', 8);
 
 export const projectCollectionsRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedLayout,
   path: '/projects/$projectId/collections',
   component: () => (
     <DashboardLayout>
@@ -25,7 +25,7 @@ export const projectCollectionsRoute = createRoute({
 });
 
 function CollectionsPage() {
-  const { projectId } = useParams({ from: '/projects/$projectId/collections' });
+  const { projectId } = useParams({ from: '/authenticated/projects/$projectId/collections' });
   const { data: collections, isLoading } = useCollections(projectId);
   const createCollection = useCreateCollection(projectId);
   const deleteCollection = useDeleteCollection(projectId);

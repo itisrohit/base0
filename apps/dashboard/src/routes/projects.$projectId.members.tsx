@@ -5,10 +5,10 @@ import { ProjectNav } from '@/components/layout/project-nav';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { useInviteMember, useMembers, useRemoveMember, useUpdateMember } from '@/hooks/use-members';
-import { rootRoute } from './__root';
+import { authenticatedLayout } from './_authenticated';
 
 export const projectMembersRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedLayout,
   path: '/projects/$projectId/members',
   component: () => (
     <DashboardLayout>
@@ -18,7 +18,7 @@ export const projectMembersRoute = createRoute({
 });
 
 function ProjectMembersPage() {
-  const { projectId } = useParams({ from: '/projects/$projectId/members' });
+  const { projectId } = useParams({ from: '/authenticated/projects/$projectId/members' });
   const { user: currentUser } = useAuth();
   const { data: members, isLoading } = useMembers(projectId);
   const inviteMember = useInviteMember(projectId);

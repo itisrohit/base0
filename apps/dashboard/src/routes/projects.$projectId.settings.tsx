@@ -4,10 +4,10 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { ProjectNav } from '@/components/layout/project-nav';
 import { Button } from '@/components/ui/button';
 import { useDeleteProject, useProject, useUpdateProject } from '@/hooks/use-projects';
-import { rootRoute } from './__root';
+import { authenticatedLayout } from './_authenticated';
 
 export const projectSettingsRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedLayout,
   path: '/projects/$projectId/settings',
   component: () => (
     <DashboardLayout>
@@ -17,7 +17,7 @@ export const projectSettingsRoute = createRoute({
 });
 
 function ProjectSettingsPage() {
-  const { projectId } = useParams({ from: '/projects/$projectId/settings' });
+  const { projectId } = useParams({ from: '/authenticated/projects/$projectId/settings' });
   const navigate = useNavigate();
   const { data: project, isLoading } = useProject(projectId);
   const updateProject = useUpdateProject(projectId);

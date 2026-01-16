@@ -4,10 +4,10 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Button } from '@/components/ui/button';
 import { useCollections } from '@/hooks/use-collections';
 import { useCreateDocument, useDeleteDocument, useDocuments } from '@/hooks/use-documents';
-import { rootRoute } from './__root';
+import { authenticatedLayout } from './_authenticated';
 
 export const projectCollectionDataRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedLayout,
   path: '/projects/$projectId/collections/$collectionId',
   component: () => (
     <DashboardLayout>
@@ -18,7 +18,7 @@ export const projectCollectionDataRoute = createRoute({
 
 function DataExplorerPage() {
   const { projectId, collectionId } = useParams({
-    from: '/projects/$projectId/collections/$collectionId',
+    from: '/authenticated/projects/$projectId/collections/$collectionId',
   });
 
   const { data: collections } = useCollections(projectId);
