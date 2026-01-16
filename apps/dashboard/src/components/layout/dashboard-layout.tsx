@@ -24,12 +24,14 @@ export function DashboardLayout({ children }: PropsWithChildren) {
               </Link>
             </nav>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{user?.email}</span>
-            <Button variant="ghost" size="sm" onClick={logout}>
-              Sign Out
-            </Button>
-          </div>
+          {user && (
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-muted-foreground">{user.email}</span>
+              <Button variant="ghost" size="sm" onClick={logout}>
+                Sign Out
+              </Button>
+            </div>
+          )}
         </div>
       </header>
 

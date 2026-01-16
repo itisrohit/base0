@@ -1,7 +1,8 @@
-import { createRoute } from '@tanstack/react-router';
+import { createRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/use-auth';
 import { useCreateProject, useProjects } from '@/hooks/use-projects';
 import { rootRoute } from './__root';
 
@@ -16,6 +17,7 @@ export const indexRoute = createRoute({
 });
 
 function ProjectsDashboard() {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { data: projects, isLoading } = useProjects();
   const createProject = useCreateProject();
   const [showCreate, setShowCreate] = useState(false);
@@ -27,6 +29,22 @@ function ProjectsDashboard() {
     setNewProjectName('');
     setShowCreate(false);
   };
+
+  if (authLoading) {
+    return <div className="text-center py-12">Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <h1 className="text-4xl font-bold mb-4">Welcome to Base0</h1>
+        <p className="text-muted-foreground mb-8">Please log in to access your projects</p>
+        <Link to="/login">
+          <Button>Go to Login</Button>
+        </Link>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return <div className="text-center py-12">Loading projects...</div>;
@@ -62,9 +80,11 @@ function ProjectsDashboard() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {projects?.map((project) => (
-          <div
+          <Link
             key={project.id}
-            className="border border-border rounded-lg p-6 bg-card hover:border-primary transition-colors cursor-pointer"
+            to="/projects/$projectId/keys"
+            params={{ projectId: project.id }}
+            className="border border-border rounded-lg p-6 bg-card hover:border-primary transition-colors block"
           >
             <h3 className="text-lg font-semibold mb-2">{project.name}</h3>
             <p className="text-sm text-muted-foreground mb-4">
@@ -73,7 +93,7 @@ function ProjectsDashboard() {
             <div className="text-xs text-muted-foreground">
               {project.createdAt && new Date(project.createdAt).toLocaleDateString()}
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
