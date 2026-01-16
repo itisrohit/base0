@@ -41,6 +41,7 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+dstore/
 .DS_Store
 
 # Framework Specific (Next.js / Vite / etc)
