@@ -57,7 +57,10 @@ describe('Base0 Advanced Primitives: Rate Limiting & Scopes', () => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({ scopes: ['read'] }),
+      body: JSON.stringify({
+        name: 'Read Only Key',
+        scopes: ['read'],
+      }),
     });
     readOnlyKey = (await rRes.json()).apiKey;
 
@@ -68,7 +71,10 @@ describe('Base0 Advanced Primitives: Rate Limiting & Scopes', () => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({ scopes: ['write'] }),
+      body: JSON.stringify({
+        name: 'Write Key',
+        scopes: ['write'],
+      }),
     });
     writeKey = (await wRes.json()).apiKey;
   });

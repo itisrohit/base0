@@ -90,6 +90,7 @@ describe('Base0 RBAC & Collaboration Tests', () => {
         Authorization: `Bearer ${viewerToken}`,
       },
       body: JSON.stringify({
+        name: 'Viewer Test',
         schemaDef: { fields: [{ name: 'test', type: 'string' }] },
       }),
     });
@@ -118,6 +119,7 @@ describe('Base0 RBAC & Collaboration Tests', () => {
         Authorization: `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
+        name: 'Admin Test',
         schemaDef: { fields: [{ name: 'test', type: 'string' }] },
       }),
     });

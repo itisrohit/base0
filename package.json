@@ -4,6 +4,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "dashboard": "cd apps/dashboard && bun run dev",
     "lint": "turbo lint",
     "format": "turbo format",
     "type-check": "turbo run type-check",

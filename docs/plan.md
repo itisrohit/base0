@@ -51,10 +51,12 @@ This project demonstrates:
 *   ✅ **S3 Storage Driver** - Implemented (Compatible with MinIO/R2)
 
 ### 5. Mission Control (Dashboard)
-*   🔄 Visual Data Explorer - Planned (Phase 3)
-*   🔄 User & Session Management - Planned
-*   🔄 Storage Browser - Planned
-*   🔄 Usage Telemetry - Planned
+*   ✅ **Projects & API Key Management** - Implemented
+*   ✅ **Schema Designer (Collections)** - Implemented
+*   ✅ **Visual Data Explorer (Documents)** - Implemented
+*   ✅ **Member Management UI** - Implemented
+*   ✅ **Storage Browser UI** - Implemented
+*   ✅ **Usage Telemetry UI** - Implemented
 
 ---
 
@@ -197,18 +199,47 @@ This project demonstrates:
 *   ✅ **Magic Link / Passwordless**: Secure email-based login (Arctic + Custom Table) - Implemented
 *   ✅ **OIDC / OAuth2 Pluggable Interface**: GitHub/Google login flow (Arctic) - Implemented
 
-### Phase 4: Mission Control (Frontend)
-*   React 19 Dashboard setup
-*   TanStack Router implementation
-*   Schema Designer (Visual UI for collections)
-*   Visual Data Explorer
-*   API Key Management UI
+### Phase 4: Mission Control (Frontend) ✅ COMPLETED
+*   ✅ **React 19 Dashboard setup**: Vite 6, Tailwind v4, Shadcn Integrated - Implemented
+*   ✅ **TanStack Router implementation**: File-based routing with code splitting - Implemented
+*   ✅ **Authentication Integration**: Magic Link and OAuth flow with protected routes - Implemented
+*   ✅ **Projects Management UI**: List and create projects with direct role-based access - Implemented
+*   ✅ **API Key Management UI**: Create, view, and revoke API keys with scope control - Implemented
+*   ✅ **Schema Designer**: Visual UI for designing collections and fields - Implemented
+*   ✅ **Visual Data Explorer**: Visual UI for CRUD operations on collection data - Implemented
+*   ✅ **Member Management UI**: Invite, role assignment, and removal of project team members - Implemented
+*   ✅ **Storage Browser UI**: Full-featured bucket management and file browser with upload/delete - Implemented
+*   ✅ **Usage Telemetry UI**: Dashboard with API request trends and storage consumption metrics - Implemented
 
-### Phase 5: Refinement & QA
-*   OpenAPI / Swagger documentation auto-generation
-*   Integration tests (Vitest)
-*   Docker Compose production readiness checks (SSL, persistence)
-*   Deployment guides (Fly.io / Vercel / Railway)
+### Phase 5: Refinement & QA (In Progress)
+*   🔄 **OpenAPI / Swagger auto-generation**: Self-documenting API using `@hono/zod-openapi`
+*   ✅ **Integration Tests**: Comprehensive test suite (33+ tests) covering RBAC, Auth, and Storage - Implemented
+*   🔄 **Production Readiness**: Docker optimization, health checks, and security headers
+*   🔄 **Deployment Guides**: Step-by-step instructions for AWS, Fly.io, and self-hosting
+
+---
+
+## Technical Notes & Production Path
+
+### 1. Usage Telemetry
+*   **Current implementation**: The `/usage` endpoint returns high-fidelity **mock telemetry data** (generated on the server) to demonstrate the Recharts visualization capabilities in the dashboard.
+*   **Production Path**: 
+    *   Implement an **Event Collector** middleware (e.g., ClickHouse or TimescaleDB) to record real-time request metrics.
+    *   Integrate with **Prometheus/Grafana** for infrastructure-level monitoring.
+    *   Replace the mock generator in `apps/api/src/routes/usage.ts` with real database aggregations.
+
+### 2. Magic Link Authentication
+*   **Current implementation**: Generates a secure token and logs the **Login URL to the server console**. This allows instant testing without an SMTP server.
+*   **Production Path**:
+    *   Plug in an **Email Provider** (Resend, Postmark, or AWS SES) via the `SMTP` driver.
+    *   Update the `auth/magic-link` route to send real emails instead of console logging.
+
+### 3. GitHub OAuth
+*   **Current implementation**: Uses the **Arctic** library with placeholders for `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`.
+*   **Production Path**:
+    *   Register a "GitHub OAuth App" in GitHub Developer Settings.
+    *   Configure the `.env` file with real production credentials.
+    *   Enable the callback URL pointing to your production domain.
 
 ---
 

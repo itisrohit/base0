@@ -1,5 +1,13 @@
 import { db } from '@base0/db';
-import { projectMembers, projects } from '@base0/db/schema';
+import {
+  apiKeys,
+  buckets,
+  collections,
+  documents,
+  files,
+  projectMembers,
+  projects,
+} from '@base0/db/schema';
 import { zValidator } from '@hono/zod-validator';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
@@ -117,17 +125,89 @@ projectsRoute.delete('/:id', authMiddleware, requirePermission('project:delete')
   const projectId = c.req.param('id');
 
   try {
-    const deleted = await db.delete(projects).where(eq(projects.id, projectId)).returning();
+    await db.transaction(async (tx) => {
+      // 1. Delete Documents first (children of Collections)
+      const projectCollections = await tx
+        .select({ id: collections.id })
+        .from(collections)
+        .where(eq(collections.projectId, projectId));
 
-    if (deleted.length === 0) {
-      return c.json({ error: 'Project not found' }, 404);
-    }
+      for (const col of projectCollections) {
+        await tx.delete(documents).where(eq(documents.collectionId, col.id));
+      }
+
+      // 2. Delete Files first (children of Buckets)
+      const projectBuckets = await tx
+        .select({ id: buckets.id })
+        .from(buckets)
+        .where(eq(buckets.projectId, projectId));
+
+      for (const bucket of projectBuckets) {
+        await tx.delete(files).where(eq(files.bucketId, bucket.id));
+      }
+
+      // 3. Delete direct children
+      await tx.delete(collections).where(eq(collections.projectId, projectId));
+      await tx.delete(buckets).where(eq(buckets.projectId, projectId));
+      await tx.delete(apiKeys).where(eq(apiKeys.projectId, projectId));
+      await tx.delete(projectMembers).where(eq(projectMembers.projectId, projectId));
+
+      // 4. Delete the project itself
+      const deleted = await tx.delete(projects).where(eq(projects.id, projectId)).returning();
+
+      if (deleted.length === 0) {
+        throw new Error('Project not found');
+      }
+    });
 
     return c.json({ message: 'Project deleted successfully' });
   } catch (error) {
-    console.error('Delete project error:', error);
-    return c.json({ error: 'Failed to delete project' }, 500);
+    console.error('Delete project error details:', error);
+    return c.json(
+      {
+        error: 'Failed to delete project',
+        message: (error as Error).message,
+      },
+      500,
+    );
   }
 });
+
+const updateProjectSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  config: z.record(z.unknown()).optional(),
+});
+
+/**
+ * PATCH /v1/projects/:id
+ * Update project settings
+ */
+projectsRoute.patch(
+  '/:id',
+  authMiddleware,
+  requirePermission('project:update'),
+  zValidator('json', updateProjectSchema),
+  async (c) => {
+    const projectId = c.req.param('id');
+    const data = c.req.valid('json');
+
+    try {
+      const [updated] = await db
+        .update(projects)
+        .set(data)
+        .where(eq(projects.id, projectId))
+        .returning();
+
+      if (!updated) {
+        return c.json({ error: 'Project not found' }, 404);
+      }
+
+      return c.json({ message: 'Project updated successfully', project: updated });
+    } catch (error) {
+      console.error('Update project error:', error);
+      return c.json({ error: 'Failed to update project' }, 500);
+    }
+  },
+);
 
 export default projectsRoute;

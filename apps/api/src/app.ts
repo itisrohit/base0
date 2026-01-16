@@ -9,6 +9,7 @@ import keys from './routes/keys';
 import members from './routes/members';
 import projects from './routes/projects';
 import storage from './routes/storage';
+import usage from './routes/usage';
 
 const app = new Hono();
 
@@ -33,8 +34,9 @@ v1.route('/auth', auth);
 v1.route('/projects', projects);
 v1.route('/projects/:projectId/members', members);
 v1.route('/projects/:projectId/collections', collections);
-v1.route('/collections/:collectionId/documents', documents);
+v1.route('/projects/:projectId/collections/:collectionId/documents', documents);
 v1.route('/projects/:projectId/keys', keys);
+v1.route('/projects/:projectId/usage', usage);
 v1.route('/storage', storage);
 
 // Root info
@@ -48,8 +50,8 @@ v1.get('/', (c) => {
       auth: '/v1/auth',
       projects: '/v1/projects',
       members: '/v1/projects/:id/members',
-      collections: '/v1/collections',
-      documents: '/v1/collections/:id/documents',
+      collections: '/v1/projects/:projectId/collections',
+      documents: '/v1/projects/:projectId/collections/:collectionId/documents',
       storage: '/v1/storage',
       health: '/health',
     },

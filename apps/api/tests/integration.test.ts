@@ -71,7 +71,10 @@ describe('Base0 Integration Tests', () => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({ scopes: ['read', 'write'] }),
+      body: JSON.stringify({
+        name: 'Test API Key',
+        scopes: ['read', 'write'],
+      }),
     });
     const data = await res.json();
     expect(res.status).toBe(201);
@@ -115,7 +118,7 @@ describe('Base0 Integration Tests', () => {
   });
 
   test('7. Create Document (using API Key)', async () => {
-    const res = await apiFetch(`/collections/${collectionId}/documents`, {
+    const res = await apiFetch(`/projects/${projectId}/collections/${collectionId}/documents`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -136,12 +139,15 @@ describe('Base0 Integration Tests', () => {
   });
 
   test('8. List Documents with Filtering', async () => {
-    const res = await apiFetch(`/collections/${collectionId}/documents?filter[rating]=5`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
+    const res = await apiFetch(
+      `/projects/${projectId}/collections/${collectionId}/documents?filter[rating]=5`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+        },
       },
-    });
+    );
     const data = await res.json();
     expect(res.status).toBe(200);
     expect(data.documents.length).toBeGreaterThan(0);
@@ -190,5 +196,73 @@ describe('Base0 Integration Tests', () => {
     const text = await res.text();
     expect(res.status).toBe(200);
     expect(text).toBe('Hello Base0 Storage');
+  });
+
+  test('12. Update Project', async () => {
+    const res = await apiFetch(`/projects/${projectId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ name: 'Updated Project Name' }),
+    });
+    const data = await res.json();
+    expect(res.status).toBe(200);
+    expect(data.project.name).toBe('Updated Project Name');
+  });
+
+  test('13. Get Usage Telemetry', async () => {
+    const res = await apiFetch(`/projects/${projectId}/usage`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const data = await res.json();
+    expect(res.status).toBe(200);
+    expect(data.usage).toBeDefined();
+  });
+
+  test('14. Delete File', async () => {
+    const res = await apiFetch(
+      `/storage/buckets/${bucketId}/files/${fileId}?projectId=${projectId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+    expect(res.status).toBe(200);
+  });
+
+  test('15. Delete Bucket', async () => {
+    const res = await apiFetch(`/storage/buckets/${bucketId}?projectId=${projectId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('16. Delete Project', async () => {
+    const res = await apiFetch(`/projects/${projectId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    expect(res.status).toBe(200);
+
+    // Verify it's gone
+    const verifyRes = await apiFetch(`/projects/${projectId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    expect(verifyRes.status).toBe(404);
   });
 });
