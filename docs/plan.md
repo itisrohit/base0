@@ -4,7 +4,7 @@
 
 Build a **hyper-efficient Backend-as-a-Service (BaaS)** that provides the **essential backend primitives**—authentication, database, file storage, and access control—in a package that is **edge-native, type-safe, and instantly deployable**.
 
-Base0 avoids the bloat of legacy platforms. It is designed for the **AI-first era**, where speed, context-window efficiency (readable code), and standard web APIs are paramount.
+Base0 avoids the bloat of legacy platforms. It is designed for the **edge-native era**, where speed, code readability, and standard web APIs are paramount.
 
 This project demonstrates:
 *   **Edge-First Architecture**: Systems designed to run on Bun, Workers, or Deno.
@@ -78,10 +78,10 @@ This project demonstrates:
 *   **UI Kit**: [shadcn/ui](https://ui.shadcn.com) (Radix primitives)
 
 ### Infrastructure & Ops
-*   **Container**: Docker (Multi-stage Alpine optimization)
-    *   **Features**: Health checks, Resource limits, Log rotation, Non-root security
-*   **CI/CD**: GitHub Actions
-*   **DevOps**: Biome (Fast Rust-based Formatter/Linter)
+Container: Docker (Multi-stage Alpine optimization)
+Features: Health checks, Resource limits, Log rotation
+CI/CD: GitHub Actions
+DevOps: Biome (Fast Rust-based Formatter/Linter)
 
 ---
 
