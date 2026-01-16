@@ -36,6 +36,7 @@ export const apiKeys = pgTable('api_keys', {
 
 export const collections = pgTable('collections', {
   id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
   projectId: text('project_id').references(() => projects.id),
   schemaDef: jsonb('schema_def').notNull(),
   permissions: jsonb('permissions').default({}),

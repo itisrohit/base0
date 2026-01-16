@@ -15,11 +15,11 @@ const app = new Hono();
 // Global middleware
 app.use('*', logger());
 app.use(
-  '*',
-  cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
-    credentials: true,
-  }),
+    '*',
+    cors({
+        origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+        credentials: true,
+    }),
 );
 
 app.use('/v1/*', standardRateLimit);
@@ -33,46 +33,46 @@ v1.route('/auth', auth);
 v1.route('/projects', projects);
 v1.route('/projects/:projectId/members', members);
 v1.route('/projects/:projectId/collections', collections);
-v1.route('/collections/:collectionId/documents', documents);
+v1.route('/projects/:projectId/collections/:collectionId/documents', documents);
 v1.route('/projects/:projectId/keys', keys);
 v1.route('/storage', storage);
 
 // Root info
 v1.get('/', (c) => {
-  return c.json({
-    name: 'Base0 API',
-    version: '1.0.0',
-    status: 'operational',
-    timestamp: new Date().toISOString(),
-    endpoints: {
-      auth: '/v1/auth',
-      projects: '/v1/projects',
-      members: '/v1/projects/:id/members',
-      collections: '/v1/collections',
-      documents: '/v1/collections/:id/documents',
-      storage: '/v1/storage',
-      health: '/health',
-    },
-  });
+    return c.json({
+        name: 'Base0 API',
+        version: '1.0.0',
+        status: 'operational',
+        timestamp: new Date().toISOString(),
+        endpoints: {
+            auth: '/v1/auth',
+            projects: '/v1/projects',
+            members: '/v1/projects/:id/members',
+            collections: '/v1/projects/:projectId/collections',
+            documents: '/v1/projects/:projectId/collections/:collectionId/documents',
+            storage: '/v1/storage',
+            health: '/health',
+        },
+    });
 });
 
 app.route('/v1', v1);
 
 // 404 handler
 app.notFound((c) => {
-  return c.json({ error: 'Not Found', path: c.req.path }, 404);
+    return c.json({ error: 'Not Found', path: c.req.path }, 404);
 });
 
 // Error handler
 app.onError((err, c) => {
-  console.error('Server error:', err);
-  return c.json(
-    {
-      error: 'Internal Server Error',
-      message: err.message,
-    },
-    500,
-  );
+    console.error('Server error:', err);
+    return c.json(
+        {
+            error: 'Internal Server Error',
+            message: err.message,
+        },
+        500,
+    );
 });
 
 export default app;

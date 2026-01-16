@@ -12,6 +12,7 @@ const collectionsRoute = new Hono<{ Variables: AuthVariables }>();
 
 // Validation schema for creating a collection
 const createCollectionSchema = z.object({
+  name: z.string().min(1).max(100),
   schemaDef: z.object({
     fields: z.array(
       z.object({
@@ -59,12 +60,13 @@ collectionsRoute.post(
   requirePermission('collection:create'),
   async (c) => {
     const projectId = c.req.param('projectId');
-    const { schemaDef, permissions } = c.req.valid('json');
+    const { name, schemaDef, permissions } = c.req.valid('json');
 
     try {
       const [newCollection] = await db
         .insert(collections)
         .values({
+          name,
           projectId,
           schemaDef,
           permissions,
