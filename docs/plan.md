@@ -18,7 +18,7 @@ This project demonstrates:
 *   **Subtract to Scale**: Every feature added is a debt. We fixate on the primitives.
 *   **Standards over Frameworks**: Use Web Standards (Request/Response) everywhere.
 *   **Type-Safe or Bust**: If it's not typed, it doesn't exist.
-*   **Local-First DX**: The dev environment matches production perfectly.
+*   **Local-First DX**: The dev environment is built for consistency and scale.
 
 ---
 
@@ -65,7 +65,7 @@ This project demonstrates:
 ### Backend (The "Edge" Core)
 *   **Runtime**: [Bun v1.2+](https://bun.sh) (Native TypeScript, localized SQLite)
 *   **Framework**: [Hono](https://hono.dev) (Ultrafast, Web Standards based, runs anywhere)
-*   **Database**: [PostgreSQL 18](https://www.postgresql.org) (Production) / **LibSQL** (Edge)
+*   **Database**: [PostgreSQL 18](https://www.postgresql.org) (Stable) / **LibSQL** (Edge)
 *   **ORM**: [Drizzle ORM](https://orm.drizzle.team) (Zero runtime overhead, SQL-like)
 *   **Validation**: [Zod](https://zod.dev) (Runtime schema validation)
 
@@ -78,9 +78,10 @@ This project demonstrates:
 *   **UI Kit**: [shadcn/ui](https://ui.shadcn.com) (Radix primitives)
 
 ### Infrastructure & Ops
-*   **Container**: Docker (Distroless images)
+*   **Container**: Docker (Multi-stage Alpine optimization)
+    *   **Features**: Health checks, Resource limits, Log rotation, Non-root security
 *   **CI/CD**: GitHub Actions
-*   **DevOps**: Biome (Formatter/Linter - Rust based)
+*   **DevOps**: Biome (Fast Rust-based Formatter/Linter)
 
 ---
 
@@ -214,52 +215,41 @@ This project demonstrates:
 ### Phase 5: Refinement & QA (In Progress)
 *   🔄 **OpenAPI / Swagger auto-generation**: Self-documenting API using `@hono/zod-openapi`
 *   ✅ **Integration Tests**: Comprehensive test suite (33+ tests) covering RBAC, Auth, and Storage - Implemented
-*   🔄 **Production Readiness**: Docker optimization, health checks, and security headers
+*   ✅ **Container Readiness**: Docker optimization, health checks, and resource management - Implemented
 
 ---
 
-## Technical Notes & Production Path
+## Technical Notes & Deployment Steps
 
 ### 1. Usage Telemetry
 *   **Current implementation**: The `/usage` endpoint returns high-fidelity **mock telemetry data** (generated on the server) to demonstrate the Recharts visualization capabilities in the dashboard.
-*   **Production Path**: 
+*   **Deployment Path**: 
     *   Implement an **Event Collector** middleware (e.g., ClickHouse or TimescaleDB) to record real-time request metrics.
     *   Integrate with **Prometheus/Grafana** for infrastructure-level monitoring.
     *   Replace the mock generator in `apps/api/src/routes/usage.ts` with real database aggregations.
 
 ### 2. Magic Link Authentication
 *   **Current implementation**: Generates a secure token and logs the **Login URL to the server console**. This allows instant testing without an SMTP server.
-*   **Production Path**:
+*   **Deployment Path**:
     *   Plug in an **Email Provider** (Resend, Postmark, or AWS SES) via the `SMTP` driver.
     *   Update the `auth/magic-link` route to send real emails instead of console logging.
 
 ### 3. GitHub OAuth
 *   **Current implementation**: Uses the **Arctic** library with placeholders for `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`.
-*   **Production Path**:
+*   **Deployment Path**:
     *   Register a "GitHub OAuth App" in GitHub Developer Settings.
-    *   Configure the `.env` file with real production credentials.
-    *   Enable the callback URL pointing to your production domain.
-
----
-
-## Next Phase: Production Readiness
-
-### Phase 6: Container Readiness (Upcoming)
-*   **Container Optimization**: Multi-stage Docker builds with distroless images for minimal size
-*   **Docker Compose Production**: Production-ready compose configuration with proper networking and volumes
-*   **Environment Management**: Secure environment variable handling and configuration validation
-*   **Health Checks**: Comprehensive container health checks and graceful shutdown handling
-*   **CI/CD Pipeline**: GitHub Actions workflow for automated testing and deployment
-*   **Container Security**: Security scanning, non-root user execution, and minimal attack surface
-*   **Resource Optimization**: Memory and CPU limits, proper signal handling, and efficient startup
+    *   Configure the `.env` file with real credentials.
+    *   Enable the callback URL pointing to your deployment domain.
 
 ---
 
 ## Project Status
 
-Base0 is a **feature-complete Backend-as-a-Service platform** with all core BaaS functionality implemented. 
+Base0 is a **feature-complete Backend-as-a-Service platform** with all core BaaS functionality and optimized development containerization complete.
 
-Phase 5 focuses on **production refinement** to make Base0 truly deployment-ready.
+The platform features comprehensive authentication, multi-tenant data management, file storage, role-based access control, and a modern dashboard - all deployable with a single `docker-compose up` command featuring built-in health checks and resource management.
+
+Phase 5 focuses on **API documentation and final development refinement**.
 
 ---
 
