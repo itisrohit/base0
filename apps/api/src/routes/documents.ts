@@ -1,113 +1,74 @@
 import { db } from '@base0/db';
-import { collections, documents, projects } from '@base0/db/schema';
+import { documents } from '@base0/db/schema';
 import { and, asc, desc, eq, sql } from 'drizzle-orm';
-import type { Context, Next } from 'hono';
 import { Hono } from 'hono';
 import { createDynamicSchema, type SchemaDefinition } from '../lib/dynamic-validator';
 import { parseFilters, parsePagination } from '../lib/query-parser';
-import { authMiddleware, getAuthContext } from '../middleware/auth';
+import { authMiddleware } from '../middleware/auth';
+import { requireResourcePermission } from '../middleware/rbac';
 import type { AuthVariables } from '../types';
 
 const documentsRoute = new Hono<{ Variables: AuthVariables }>();
 
 /**
- * Middleware to check collection access via project ownership
- */
-const checkCollectionAccess = async (c: Context<{ Variables: AuthVariables }>, next: Next) => {
-  const auth = getAuthContext(c);
-  const collectionId = c.req.param('collectionId');
-
-  if (!collectionId) {
-    return c.json({ error: 'Collection ID is required' }, 400);
-  }
-
-  // Optimize: If it's an API Key, we can check collectionId belongs to auth.projectId
-  // For both cases, we can inner join with projects and check either ownerId or projectId
-
-  const [result] = await db
-    .select({
-      collection: collections,
-      ownerId: projects.ownerId,
-      projectId: projects.id,
-    })
-    .from(collections)
-    .innerJoin(projects, eq(collections.projectId, projects.id))
-    .where(eq(collections.id, collectionId))
-    .limit(1);
-
-  if (!result) {
-    return c.json({ error: 'Collection not found' }, 404);
-  }
-
-  // Authorization check
-  if (auth.authType === 'apiKey') {
-    if (result.projectId !== auth.projectId) {
-      return c.json({ error: 'Unauthorized: API Key is not valid for this collection' }, 403);
-    }
-  } else {
-    // JWT User
-    if (result.ownerId !== auth.userId) {
-      return c.json({ error: 'Unauthorized: You do not own this collection' }, 403);
-    }
-  }
-
-  // Attach collection to variables
-  c.set('collection', result.collection);
-  return next();
-};
-
-/**
  * GET /v1/collections/:collectionId/documents
  * List all documents in a collection with filtering and pagination
  */
-documentsRoute.get('/:collectionId/documents', authMiddleware, checkCollectionAccess, async (c) => {
-  const collectionId = c.req.param('collectionId');
-  const query = c.req.query();
+documentsRoute.get(
+  '/',
+  authMiddleware,
+  requireResourcePermission('collection', 'document:read'),
+  async (c) => {
+    const collectionId = c.req.param('collectionId');
+    const query = c.req.query();
 
-  const filters = parseFilters(query);
-  const { limit, offset, sort, order } = parsePagination(query);
+    const filters = parseFilters(query);
+    const { limit, offset, sort, order } = parsePagination(query);
 
-  try {
-    const queryBuilder = db
-      .select()
-      .from(documents)
-      .where(and(eq(documents.collectionId, collectionId), filters))
-      .limit(limit ?? 25)
-      .offset(offset ?? 0);
+    try {
+      const queryBuilder = db
+        .select()
+        .from(documents)
+        .where(and(eq(documents.collectionId, collectionId), filters))
+        .limit(limit ?? 25)
+        .offset(offset ?? 0);
 
-    // Sorting logic
-    if (sort === 'createdAt') {
-      queryBuilder.orderBy(order === 'desc' ? desc(documents.createdAt) : asc(documents.createdAt));
-    } else if (sort) {
-      // Sort by JSONB field
-      const jsonSortField = sql`${documents.data} ->> ${sort} `;
-      queryBuilder.orderBy(order === 'desc' ? desc(jsonSortField) : asc(jsonSortField));
+      // Sorting logic
+      if (sort === 'createdAt') {
+        queryBuilder.orderBy(
+          order === 'desc' ? desc(documents.createdAt) : asc(documents.createdAt),
+        );
+      } else if (sort) {
+        // Sort by JSONB field
+        const jsonSortField = sql`${documents.data} ->> ${sort} `;
+        queryBuilder.orderBy(order === 'desc' ? desc(jsonSortField) : asc(jsonSortField));
+      }
+
+      const docs = await queryBuilder;
+
+      return c.json({
+        documents: docs,
+        pagination: {
+          limit,
+          offset,
+          count: docs.length,
+        },
+      });
+    } catch (error) {
+      console.error('List documents error:', error);
+      return c.json({ error: 'Failed to list documents' }, 500);
     }
-
-    const docs = await queryBuilder;
-
-    return c.json({
-      documents: docs,
-      pagination: {
-        limit,
-        offset,
-        count: docs.length,
-      },
-    });
-  } catch (error) {
-    console.error('List documents error:', error);
-    return c.json({ error: 'Failed to list documents' }, 500);
-  }
-});
+  },
+);
 
 /**
  * POST /v1/collections/:collectionId/documents
  * Create a new document with dynamic validation
  */
 documentsRoute.post(
-  '/:collectionId/documents',
+  '/',
   authMiddleware,
-  checkCollectionAccess,
+  requireResourcePermission('collection', 'document:create'),
   async (c) => {
     const collectionId = c.req.param('collectionId');
     const collection = c.get('collection');
@@ -162,9 +123,9 @@ documentsRoute.post(
  * Partial update of a document
  */
 documentsRoute.patch(
-  '/:collectionId/documents/:id',
+  '/:id',
   authMiddleware,
-  checkCollectionAccess,
+  requireResourcePermission('collection', 'document:update'),
   async (c) => {
     const collectionId = c.req.param('collectionId');
     const docId = c.req.param('id');
@@ -195,7 +156,7 @@ documentsRoute.patch(
       const [updatedDoc] = await db
         .update(documents)
         .set({
-          data: validationResult.data, // This overlaps existing fields in JSONB usually requires different logic for true partial patch
+          data: validationResult.data,
         })
         .where(and(eq(documents.id, docId), eq(documents.collectionId, collectionId)))
         .returning();
@@ -220,9 +181,9 @@ documentsRoute.patch(
  * Delete a document
  */
 documentsRoute.delete(
-  '/:collectionId/documents/:id',
+  '/:id',
   authMiddleware,
-  checkCollectionAccess,
+  requireResourcePermission('collection', 'document:delete'),
   async (c) => {
     const collectionId = c.req.param('collectionId');
     const docId = c.req.param('id');

@@ -1,11 +1,12 @@
 import { db } from '@base0/db';
 import { projectMembers, projects } from '@base0/db/schema';
 import { zValidator } from '@hono/zod-validator';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
-import { authMiddleware, getAuthContext, getAuthUser } from '../middleware/auth';
+import { authMiddleware, getAuthUser } from '../middleware/auth';
+import { requirePermission } from '../middleware/rbac';
 import type { AuthVariables } from '../types';
 
 const projectsRoute = new Hono<{ Variables: AuthVariables }>();
@@ -18,13 +19,25 @@ const createProjectSchema = z.object({
 
 /**
  * GET /v1/projects
- * List projects owned by the authenticated user
+ * List projects where the authenticated user is a member
  */
 projectsRoute.get('/', authMiddleware, async (c) => {
   const { userId } = getAuthUser(c);
 
   try {
-    const userProjects = await db.select().from(projects).where(eq(projects.ownerId, userId));
+    // Select projects via project_members to include those where user is not the owner
+    const userProjects = await db
+      .select({
+        id: projects.id,
+        name: projects.name,
+        ownerId: projects.ownerId,
+        config: projects.config,
+        createdAt: projects.createdAt,
+        role: projectMembers.role,
+      })
+      .from(projects)
+      .innerJoin(projectMembers, eq(projects.id, projectMembers.projectId))
+      .where(eq(projectMembers.userId, userId));
 
     return c.json({ projects: userProjects });
   } catch (error) {
@@ -79,27 +92,11 @@ projectsRoute.post('/', authMiddleware, zValidator('json', createProjectSchema),
  * GET /v1/projects/:id
  * Get details of a specific project
  */
-projectsRoute.get('/:id', authMiddleware, async (c) => {
-  const auth = getAuthContext(c);
+projectsRoute.get('/:id', authMiddleware, requirePermission('project:read'), async (c) => {
   const projectId = c.req.param('id');
 
   try {
-    // If API Key, check if it matches the requested project
-    if (auth.authType === 'apiKey') {
-      if (auth.projectId !== projectId) {
-        return c.json({ error: 'Unauthorized: API Key is not valid for this project' }, 403);
-      }
-    }
-
-    const [project] = await db
-      .select()
-      .from(projects)
-      .where(
-        auth.authType === 'apiKey'
-          ? eq(projects.id, projectId)
-          : and(eq(projects.id, projectId), eq(projects.ownerId, auth.userId ?? '')),
-      )
-      .limit(1);
+    const [project] = await db.select().from(projects).where(eq(projects.id, projectId)).limit(1);
 
     if (!project) {
       return c.json({ error: 'Project not found' }, 404);
@@ -114,20 +111,16 @@ projectsRoute.get('/:id', authMiddleware, async (c) => {
 
 /**
  * DELETE /v1/projects/:id
- * Delete a project
+ * Delete a project (Only owners can do this)
  */
-projectsRoute.delete('/:id', authMiddleware, async (c) => {
-  const { userId } = getAuthUser(c);
+projectsRoute.delete('/:id', authMiddleware, requirePermission('project:delete'), async (c) => {
   const projectId = c.req.param('id');
 
   try {
-    const deleted = await db
-      .delete(projects)
-      .where(and(eq(projects.id, projectId), eq(projects.ownerId, userId)))
-      .returning();
+    const deleted = await db.delete(projects).where(eq(projects.id, projectId)).returning();
 
     if (deleted.length === 0) {
-      return c.json({ error: 'Project not found or unauthorized' }, 404);
+      return c.json({ error: 'Project not found' }, 404);
     }
 
     return c.json({ message: 'Project deleted successfully' });
