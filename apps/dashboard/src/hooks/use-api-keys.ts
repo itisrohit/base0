@@ -3,17 +3,21 @@ import { api } from '@/lib/api';
 
 export interface ApiKey {
   id: string;
-  keyId: string;
   name: string;
-  scope: 'read' | 'write' | 'admin';
+  keyId: string;
+  projectId: string;
+  scopes: string[];
   createdAt: string;
-  lastUsed?: string;
 }
 
 export interface CreateApiKeyResponse {
+  message: string;
+  apiKey: string; // The full key like "b0_xxxxx_yyyyy"
+  id: string;
+  name: string;
   keyId: string;
-  secret: string;
-  apiKey: ApiKey;
+  projectId: string;
+  scopes: string[];
 }
 
 export function useApiKeys(projectId: string) {
@@ -31,7 +35,7 @@ export function useCreateApiKey(projectId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (vars: { name: string; scope: 'read' | 'write' | 'admin' }) => {
+    mutationFn: async (vars: { name: string; scopes: string[] }) => {
       const { data } = await api.post<CreateApiKeyResponse>(`/projects/${projectId}/keys`, vars);
       return data;
     },

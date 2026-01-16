@@ -22,22 +22,29 @@ function ApiKeysPage() {
   const revokeKey = useRevokeApiKey(projectId);
 
   const [showCreate, setShowCreate] = useState(false);
-  const [newKeyName, setNewKeyName] = useState('');
-  const [newKeyScope, setNewKeyScope] = useState<'read' | 'write' | 'admin'>('read');
-  const [createdSecret, setCreatedSecret] = useState<string | null>(null);
+  const [keyName, setKeyName] = useState('');
+  const [selectedScopes, setSelectedScopes] = useState<string[]>(['read']);
+  const [createdKey, setCreatedKey] = useState<string | null>(null);
 
   const handleCreate = async () => {
-    if (!newKeyName.trim()) return;
-    const result = await createKey.mutateAsync({ name: newKeyName, scope: newKeyScope });
-    setCreatedSecret(result.secret);
-    setNewKeyName('');
+    if (!keyName.trim()) return;
+    const result = await createKey.mutateAsync({ name: keyName, scopes: selectedScopes });
+    setCreatedKey(result.apiKey);
     setShowCreate(false);
+    setKeyName('');
+    setSelectedScopes(['read']);
   };
 
   const handleRevoke = async (keyId: string) => {
     if (confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) {
       await revokeKey.mutateAsync(keyId);
     }
+  };
+
+  const toggleScope = (scope: string) => {
+    setSelectedScopes((prev) =>
+      prev.includes(scope) ? prev.filter((s) => s !== scope) : [...prev, scope],
+    );
   };
 
   if (isLoading) {
@@ -56,25 +63,25 @@ function ApiKeysPage() {
         </Button>
       </div>
 
-      {createdSecret && (
+      {createdKey && (
         <div className="border border-green-500 rounded-lg p-6 bg-green-950/20 space-y-4">
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-xl font-semibold text-green-400">API Key Created!</h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Copy this secret now. You won't be able to see it again.
+                Copy this key now. You won't be able to see it again.
               </p>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => setCreatedSecret(null)}>
+            <Button variant="ghost" size="sm" onClick={() => setCreatedKey(null)}>
               Dismiss
             </Button>
           </div>
-          <div className="bg-background rounded p-4 font-mono text-sm break-all">
-            {createdSecret}
+          <div className="bg-background rounded p-4 font-mono text-sm break-all border border-green-500/30">
+            {createdKey}
           </div>
           <Button
             onClick={() => {
-              navigator.clipboard.writeText(createdSecret);
+              navigator.clipboard.writeText(createdKey);
             }}
           >
             Copy to Clipboard
@@ -93,28 +100,37 @@ function ApiKeysPage() {
               <input
                 id="key-name"
                 type="text"
-                value={newKeyName}
-                onChange={(e) => setNewKeyName(e.target.value)}
+                value={keyName}
+                onChange={(e) => setKeyName(e.target.value)}
                 placeholder="e.g., Production API Key"
                 className="w-full px-4 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
             <div>
-              <label htmlFor="key-scope" className="block text-sm font-medium mb-2">
-                Scope
-              </label>
-              <select
-                id="key-scope"
-                value={newKeyScope}
-                onChange={(e) => setNewKeyScope(e.target.value as 'read' | 'write' | 'admin')}
-                className="w-full px-4 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-              >
-                <option value="read">Read - View data only</option>
-                <option value="write">Write - Create and update data</option>
-                <option value="admin">Admin - Full access including deletion</option>
-              </select>
+              <div className="block text-sm font-medium mb-3">Scopes</div>
+              <div className="space-y-2">
+                {['read', 'write', 'delete'].map((scope) => (
+                  <label key={scope} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedScopes.includes(scope)}
+                      onChange={() => toggleScope(scope)}
+                      className="w-4 h-4 rounded border-gray-600 bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900"
+                    />
+                    <span className="text-sm capitalize">{scope}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {scope === 'read' && '- View data only'}
+                      {scope === 'write' && '- Create and update data'}
+                      {scope === 'delete' && '- Delete data'}
+                    </span>
+                  </label>
+                ))}
+              </div>
             </div>
-            <Button onClick={handleCreate} disabled={createKey.isPending}>
+            <Button
+              onClick={handleCreate}
+              disabled={createKey.isPending || selectedScopes.length === 0 || !keyName.trim()}
+            >
               {createKey.isPending ? 'Creating...' : 'Create Key'}
             </Button>
           </div>
@@ -126,26 +142,28 @@ function ApiKeysPage() {
           <div key={key.id} className="border border-border rounded-lg p-6 bg-card">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 mb-2">
                   <h3 className="text-lg font-semibold">{key.name}</h3>
-                  <span
-                    className={`px-2 py-1 text-xs rounded-full ${
-                      key.scope === 'admin'
-                        ? 'bg-red-500/20 text-red-400'
-                        : key.scope === 'write'
-                          ? 'bg-yellow-500/20 text-yellow-400'
-                          : 'bg-blue-500/20 text-blue-400'
-                    }`}
-                  >
-                    {key.scope}
-                  </span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-2 font-mono">Key ID: {key.keyId}</p>
-                <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
-                  <span>Created: {new Date(key.createdAt).toLocaleDateString()}</span>
-                  {key.lastUsed && (
-                    <span>Last used: {new Date(key.lastUsed).toLocaleDateString()}</span>
-                  )}
+                <p className="text-sm text-muted-foreground font-mono mb-3">{key.keyId}</p>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {key.scopes?.map((scope) => (
+                    <span
+                      key={scope}
+                      className={`px-2 py-1 text-xs rounded-full ${
+                        scope === 'delete'
+                          ? 'bg-red-500/20 text-red-400'
+                          : scope === 'write'
+                            ? 'bg-yellow-500/20 text-yellow-400'
+                            : 'bg-blue-500/20 text-blue-400'
+                      }`}
+                    >
+                      {scope}
+                    </span>
+                  ))}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Created: {new Date(key.createdAt).toLocaleString()}
                 </div>
               </div>
               <Button
