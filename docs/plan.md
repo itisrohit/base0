@@ -54,9 +54,9 @@ This project demonstrates:
 *   ✅ **Projects & API Key Management** - Implemented
 *   ✅ **Schema Designer (Collections)** - Implemented
 *   ✅ **Visual Data Explorer (Documents)** - Implemented
-*   🔄 **User & Session Management UI** - Planned
-*   🔄 **Storage Browser UI** - Planned
-*   🔄 **Usage Telemetry UI** - Planned
+*   ✅ **Member Management UI** - Implemented
+*   ✅ **Storage Browser UI** - Implemented
+*   ✅ **Usage Telemetry UI** - Implemented
 
 ---
 
@@ -199,23 +199,23 @@ This project demonstrates:
 *   ✅ **Magic Link / Passwordless**: Secure email-based login (Arctic + Custom Table) - Implemented
 *   ✅ **OIDC / OAuth2 Pluggable Interface**: GitHub/Google login flow (Arctic) - Implemented
 
-### Phase 4: Mission Control (Frontend) (In Progress)
+### Phase 4: Mission Control (Frontend) ✅ COMPLETED
 *   ✅ **React 19 Dashboard setup**: Vite 6, Tailwind v4, Shadcn Integrated - Implemented
 *   ✅ **TanStack Router implementation**: File-based routing with code splitting - Implemented
 *   ✅ **Authentication Integration**: Magic Link and OAuth flow with protected routes - Implemented
-*   ✅ **Projects Management UI**: List and create projects with the role-based access - Implemented
+*   ✅ **Projects Management UI**: List and create projects with direct role-based access - Implemented
 *   ✅ **API Key Management UI**: Create, view, and revoke API keys with scope control - Implemented
 *   ✅ **Schema Designer**: Visual UI for designing collections and fields - Implemented
 *   ✅ **Visual Data Explorer**: Visual UI for CRUD operations on collection data - Implemented
-*   🔄 **User & Session Management UI**: View and manage active project members and sessions
-*   🔄 **Storage Browser UI**: File explorer for project storage buckets
-*   🔄 **Usage Telemetry UI**: Basic charts for API usage and storage consumption
+*   ✅ **Member Management UI**: Invite, role assignment, and removal of project team members - Implemented
+*   ✅ **Storage Browser UI**: Full-featured bucket management and file browser with upload/delete - Implemented
+*   ✅ **Usage Telemetry UI**: Dashboard with API request trends and storage consumption metrics - Implemented
 
-### Phase 5: Refinement & QA (Next)
-*   OpenAPI / Swagger documentation auto-generation
-*   Integration tests (Vitest)
-*   Docker Compose production readiness checks (SSL, persistence)
-*   Deployment guides (Fly.io / Vercel / Railway)
+### Phase 5: Refinement & QA (In Progress)
+*   🔄 **OpenAPI / Swagger auto-generation**: Self-documenting API using `@hono/zod-openapi`
+*   🔄 **Integration Tests**: Comprehensive test suite using Vitest and Supertest
+*   🔄 **Production Readiness**: Docker optimization, health checks, and security headers
+*   🔄 **Deployment Guides**: Step-by-step instructions for AWS, Fly.io, and self-hosting
 
 ---
 
