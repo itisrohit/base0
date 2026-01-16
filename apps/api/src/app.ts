@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
+import { standardRateLimit } from './middleware/rate-limit';
 import auth from './routes/auth';
 import collections from './routes/collections';
 import documents from './routes/documents';
@@ -20,6 +21,8 @@ app.use(
     credentials: true,
   }),
 );
+
+app.use('/v1/*', standardRateLimit);
 
 // Health check
 app.get('/health', (c) => c.text('OK'));
