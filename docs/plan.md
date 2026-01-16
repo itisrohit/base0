@@ -49,7 +49,8 @@ Target audience: **Senior engineers & modern product teams**.
 ### 4. Access Control (IAM)
 *   ✅ **API Key Provisioning** - Implemented
 *   ✅ **Unified Auth Middleware** - Implemented (JWT + API Key support)
-*   🔄 Scoped Permissions (RBAC) - In Progress (Schema Ready)
+*   ✅ **Granular RBAC** - Implemented (Owner, Admin, Member, Viewer)
+*   ✅ **Member Management** - Implemented (Invite/Remove flow)
 *   🔄 Rate Limiting - Planned
 
 ### 5. Mission Control (Dashboard)
@@ -175,13 +176,13 @@ Target audience: **Senior engineers & modern product teams**.
 *   ✅ **Blob Storage System**: Plug-and-play storage architecture with Local driver support - Implemented
 *   ✅ **File Storage API**: Secure bucket management, file uploads (with metadata), and streaming downloads - Implemented
 *   ✅ **Permissions Foundation**: Schema support for multi-member projects and RBAC - Implemented
+*   ✅ **Scoped RBAC**: Enforcing granular roles (Owner, Admin, Member, Viewer) - Implemented
+*   ✅ **Member Management**: Invite/Remove flow for projects - Implemented
 
-**Next focus: Refinement & Scoped Permissions**
-- **Scoped RBAC**: Enforcing granular roles (Owner, Admin, Member, Viewer)
-- **API Key Scopes**: Restricting keys to specific operations (Read-only, Write-only)
-- **Member Management**: Invite/Remove flow for projects
-- **S3 Storage Driver**: AWS S3/Minio compatibility layer
-- **Rate Limiting**: Base computational metering per project/key
+**Next focus: Advanced Management & Frontend**
+*   🔄 **API Key Scopes**: Restricting keys to specific operations (Read-only, Write-only) - Planned
+*   🔄 **S3 Storage Driver**: AWS S3/Minio compatibility layer - Planned
+*   🔄 **Rate Limiting**: Base computational metering per project/key - Planned
 
 ### Phase 4: Mission Control (Frontend)
 *   React 19 Dashboard setup
