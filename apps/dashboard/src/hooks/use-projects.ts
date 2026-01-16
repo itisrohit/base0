@@ -15,7 +15,7 @@ export function useProjects() {
     queryKey: ['projects'],
     queryFn: async () => {
       const { data } = await api.get<{ projects: Project[] }>('/projects');
-      return data.projects;
+      return data.projects || [];
     },
   });
 }
