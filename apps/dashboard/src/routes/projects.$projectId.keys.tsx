@@ -1,6 +1,7 @@
-import { createRoute, Link, useParams } from '@tanstack/react-router';
+import { createRoute, useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
+import { ProjectNav } from '@/components/layout/project-nav';
 import { Button } from '@/components/ui/button';
 import { useApiKeys, useCreateApiKey, useRevokeApiKey } from '@/hooks/use-api-keys';
 import { rootRoute } from './__root';
@@ -53,23 +54,7 @@ function ApiKeysPage() {
 
   return (
     <div className="space-y-6">
-      {/* Project Sub-nav */}
-      <div className="flex gap-4 border-b border-border pb-4 mb-4">
-        <Link
-          to="/projects/$projectId/collections"
-          params={{ projectId }}
-          className="text-sm font-medium text-muted-foreground hover:text-foreground pb-4"
-        >
-          Collections
-        </Link>
-        <Link
-          to="/projects/$projectId/keys"
-          params={{ projectId }}
-          className="text-sm font-medium text-primary border-b-2 border-primary pb-4 -mb-4.5"
-        >
-          API Keys
-        </Link>
-      </div>
+      <ProjectNav />
 
       <div className="flex items-center justify-between">
         <div>
