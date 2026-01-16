@@ -1,6 +1,7 @@
 import { createRouter } from '@tanstack/react-router';
 import { queryClient } from '@/lib/query-client';
 import { rootRoute } from './routes/__root';
+import { authenticatedLayout } from './routes/_authenticated';
 import { indexRoute } from './routes/index';
 import { loginRoute } from './routes/login';
 import { projectCollectionsRoute } from './routes/projects.$projectId.collections';
@@ -12,15 +13,17 @@ import { projectStorageRoute } from './routes/projects.$projectId.storage';
 import { projectUsageRoute } from './routes/projects.$projectId.usage';
 
 const routeTree = rootRoute.addChildren([
-  indexRoute,
   loginRoute,
-  projectKeysRoute,
-  projectCollectionsRoute,
-  projectCollectionDataRoute,
-  projectMembersRoute,
-  projectSettingsRoute,
-  projectStorageRoute,
-  projectUsageRoute,
+  authenticatedLayout.addChildren([
+    indexRoute,
+    projectKeysRoute,
+    projectCollectionsRoute,
+    projectCollectionDataRoute,
+    projectMembersRoute,
+    projectSettingsRoute,
+    projectStorageRoute,
+    projectUsageRoute,
+  ]),
 ]);
 
 export const router = createRouter({
