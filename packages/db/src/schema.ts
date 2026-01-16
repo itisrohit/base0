@@ -13,6 +13,7 @@ export const projects = pgTable('projects', {
   name: text('name').notNull(),
   ownerId: uuid('owner_id').references(() => users.id),
   config: jsonb('config').default({}),
+  createdAt: timestamp('created_at').defaultNow(),
 });
 
 export const projectMembers = pgTable('project_members', {
