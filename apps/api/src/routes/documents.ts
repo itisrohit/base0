@@ -77,14 +77,15 @@ documentsRoute.post(
       return c.json({ error: 'Collection context not found' }, 500);
     }
 
-    const data = await c.req.json();
+    const body = await c.req.json().catch(() => ({}));
+    const docData = body.data || body;
 
     try {
       // 1. Build dynamic Zod schema from collection definition
       const dynamicSchema = createDynamicSchema(collection.schemaDef as SchemaDefinition);
 
       // 2. Validate data against schema
-      const validationResult = dynamicSchema.safeParse(data);
+      const validationResult = dynamicSchema.safeParse(docData);
       if (!validationResult.success) {
         return c.json(
           {
