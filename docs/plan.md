@@ -1,15 +1,16 @@
-# Base0 — Next-Gen Lightweight BaaS
+# Base0 — A Minimal Backend Platform
 
 ## Vision
 
-Build a **hyper-efficient Backend-as-a-Service (BaaS)** that provides the **essential backend primitives**—authentication, database, file storage, and access control—in a package that is **edge-native, type-safe, and instantly deployable**.
+Base0 is a minimal Backend-as-a-Service focused on core backend primitives:
+authentication, structured data, file storage, and access control.
 
-Base0 avoids the bloat of legacy platforms. It is designed for the **edge-native era**, where speed, code readability, and standard web APIs are paramount.
+The goal is not feature breadth, but architectural clarity — a system that is
+easy to reason about, easy to extend, and easy to deploy across modern runtimes
+(Bun, Workers, Deno).
 
-This project demonstrates:
-*   **Edge-First Architecture**: Systems designed to run on Bun, Workers, or Deno.
-*   **End-to-End Type Safety**: 100% shared types between client and server.
-*   **Minimalist System Design**: High leverage with zero "magic".
+Base0 intentionally avoids platform bloat in favor of explicit design,
+type safety, and standard web APIs.
 
 ---
 
@@ -17,46 +18,43 @@ This project demonstrates:
 
 *   **Subtract to Scale**: Every feature added is a debt. We fixate on the primitives.
 *   **Standards over Frameworks**: Use Web Standards (Request/Response) everywhere.
-*   **Type-Safe or Bust**: If it's not typed, it doesn't exist.
+*   **Type Safety as a Contract**: If it's not typed, it doesn't exist.
 *   **Local-First DX**: The dev environment is built for consistency and scale.
 
 ---
 
-## Core Features (v1)
+## Core Primitives
+### 1. Authentication
+*   JWT-based sessions with access & refresh tokens
+*   Argon2id password hashing
+*   Unified auth middleware for route protection
+*   Passwordless login via Magic Links
 
-### 1. Authentication (Zero-Trust)
-*   ✅ **Traditional Email/Password (Argon2id)** - Implemented
-*   ✅ **JWT Sessions** - Implemented with Access/Refresh tokens
-*   ✅ **Auth Middleware** - Implemented for route protection
-*   ✅ **Magic Link** - Implemented
+### 2. Data Engine
+*   Dynamic JSONB schema definition
+*   Runtime validation via Zod
+*   CRUD operations for collections and documents
+*   Multi-tenant isolation via project scopes
+*   Advanced filtering engine (eq, lt, gt, contains)
 
-### 2. Data Engine (Collections)
-*   ✅ **Dynamic Schema Definition** - Implemented via JSONB
-*   ✅ **Dynamic Validation** - Implemented with runtime Zod engine
-*   ✅ **CRUD API** - Implemented for Collections and Documents
-*   ✅ **Multi-tenancy** - Implemented via Projects logical isolation
-*   ✅ **Filtering Engine (eq, lt, gt, contains)** - Implemented with PostgreSQL JSONB
+### 3. Storage
+*   Pluggable driver architecture (Local/S3)
+*   File metadata tracking in PostgreSQL
+*   Secure upload and streaming download support
 
-### 3. Blob Storage
-*   ✅ **Pluggable Architecture** - Implemented (Local/S3 Abstraction)
-*   ✅ **File Metadata & Tracking** - Implemented in database
-*   ✅ **Secure Upload/Download** - Implemented with stream support
+### 4. Access Control
+*   API Key provisioning with surgical scope enforcement
+*   Granular RBAC (Owner, Admin, Member, Viewer)
+*   Member management flows
+*   Protective in-memory rate limiting
 
-### 4. Access Control (IAM)
-*   ✅ **API Key Provisioning** - Implemented
-*   ✅ **Unified Auth Middleware** - Implemented (JWT + API Key support)
-*   ✅ **Granular RBAC** - Implemented (Owner, Admin, Member, Viewer)
-*   ✅ **Member Management** - Implemented (Invite/Remove flow)
-*   ✅ **Rate Limiting** - Implemented (In-memory, protective primitive)
-*   ✅ **S3 Storage Driver** - Implemented (Compatible with MinIO/R2)
-
-### 5. Mission Control (Dashboard)
-*   ✅ **Projects & API Key Management** - Implemented
-*   ✅ **Schema Designer (Collections)** - Implemented
-*   ✅ **Visual Data Explorer (Documents)** - Implemented
-*   ✅ **Member Management UI** - Implemented
-*   ✅ **Storage Browser UI** - Implemented
-*   ✅ **Usage Telemetry UI** - Implemented
+## Control Plane
+### Dashboard & Telemetry
+*   React-based mission control interface
+*   Visual schema designer and data explorer
+*   Project and API key management
+*   Storage browser for bucket/file operations
+*   Real-time usage metrics visualization
 
 ---
 
@@ -191,7 +189,7 @@ Full schema definition available in `packages/db/schema.ts`.
 
 **Core v1 is completed.** ✅
 
-Base0 now provides a fully functional, production-ready backend foundation including Authentication, Database, Storage, and a comprehensive Dashboard.
+Base0 now provides a complete, functional backend foundation including Authentication, Database, Storage, and a comprehensive Dashboard.
 
 ### Future Roadmap (v2+)
 For details on future implementation phases including Realtime capabilities, Vector Databases, and Enterprise Auth, please see [docs/roadmap.md](./roadmap.md).

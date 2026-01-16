@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  A high-performance, lightweight Backend-as-a-Service (BaaS) built for the edge-native era.
+  Base0 — Minimal Backend Platform
 </p>
 
 <p align="center">
@@ -20,7 +20,7 @@
 
 ## Overview
 
-Base0 provides essential backend primitives including authentication, collection-based data storage, and blob storage, all implemented with a zero-trust architecture and type-safe developer experience. It avoids legacy bloat, focusing on minimalist system design and Web Standards compatibility.
+Designed and implemented a lightweight BaaS providing authentication, document storage, file handling, and RBAC with a type-safe API and React-based control plane.
 
 ## Architecture
 
