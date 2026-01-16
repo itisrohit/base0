@@ -26,6 +26,7 @@ export const projectMembers = pgTable('project_members', {
 
 export const apiKeys = pgTable('api_keys', {
   id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(), // User-friendly name
   keyId: text('key_id').notNull().unique(), // Public part for lookup
   keyHash: text('key_hash').notNull(), // Hashed secret
   projectId: text('project_id').references(() => projects.id),
