@@ -12,7 +12,8 @@
   },
   "exports": {
     ".": "./src/index.ts",
-    "./schema": "./src/schema.ts"
+    "./schema": "./src/schema.ts",
+    "./auth": "./src/auth.ts"
   },
   "dependencies": {
     "drizzle-orm": "latest",
