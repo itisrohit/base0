@@ -52,13 +52,13 @@ describe('Base0 Integration Tests', () => {
   });
 
   test('4. Create API Key', async () => {
-    const res = await fetch(`${API_URL}/keys`, {
+    const res = await fetch(`${API_URL}/projects/${projectId}/keys`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({ projectId, scopes: ['read', 'write'] }),
+      body: JSON.stringify({ scopes: ['read', 'write'] }),
     });
     const data = await res.json();
     expect(res.status).toBe(201);
@@ -67,7 +67,7 @@ describe('Base0 Integration Tests', () => {
   });
 
   test('5. Create Collection (using JWT)', async () => {
-    const res = await fetch(`${API_URL}/collections`, {
+    const res = await fetch(`${API_URL}/projects/${projectId}/collections`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
