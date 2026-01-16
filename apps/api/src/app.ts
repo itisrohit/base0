@@ -6,6 +6,7 @@ import collections from './routes/collections';
 import documents from './routes/documents';
 import keys from './routes/keys';
 import projects from './routes/projects';
+import storage from './routes/storage';
 
 const app = new Hono();
 
@@ -29,6 +30,7 @@ v1.route('/projects', projects);
 v1.route('/collections', collections);
 v1.route('/collections', documents);
 v1.route('/keys', keys);
+v1.route('/storage', storage);
 
 // Root info
 v1.get('/', (c) => {
@@ -42,6 +44,7 @@ v1.get('/', (c) => {
       projects: '/v1/projects',
       collections: '/v1/collections',
       documents: '/v1/collections/:id/documents',
+      storage: '/v1/storage',
       health: '/health',
     },
   });
