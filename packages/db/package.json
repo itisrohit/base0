@@ -4,15 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "exports": {
     ".": "./src/index.ts",
-    "./schema": "./src/schema.ts"
+    "./schema": "./src/schema.ts",
+    "./auth": "./src/auth.ts"
   },
   "dependencies": {
     "drizzle-orm": "latest",
-    "@libsql/client": "latest",
+    "postgres": "^3.4.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
