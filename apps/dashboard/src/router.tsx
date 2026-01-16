@@ -3,8 +3,9 @@ import { queryClient } from '@/lib/query-client';
 import { rootRoute } from './routes/__root';
 import { indexRoute } from './routes/index';
 import { loginRoute } from './routes/login';
+import { projectKeysRoute } from './routes/projects.$projectId.keys';
 
-const routeTree = rootRoute.addChildren([indexRoute, loginRoute]);
+const routeTree = rootRoute.addChildren([indexRoute, loginRoute, projectKeysRoute]);
 
 export const router = createRouter({
   routeTree,
