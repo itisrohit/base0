@@ -1,35 +1,88 @@
-import { createRoute, Link } from '@tanstack/react-router';
+import { createRoute } from '@tanstack/react-router';
+import { useState } from 'react';
+import { DashboardLayout } from '@/components/layout/dashboard-layout';
+import { Button } from '@/components/ui/button';
+import { useCreateProject, useProjects } from '@/hooks/use-projects';
 import { rootRoute } from './__root';
 
 export const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: DashboardHome,
+  component: () => (
+    <DashboardLayout>
+      <ProjectsDashboard />
+    </DashboardLayout>
+  ),
 });
 
-function DashboardHome() {
+function ProjectsDashboard() {
+  const { data: projects, isLoading } = useProjects();
+  const createProject = useCreateProject();
+  const [showCreate, setShowCreate] = useState(false);
+  const [newProjectName, setNewProjectName] = useState('');
+
+  const handleCreate = async () => {
+    if (!newProjectName.trim()) return;
+    await createProject.mutateAsync({ name: newProjectName });
+    setNewProjectName('');
+    setShowCreate(false);
+  };
+
+  if (isLoading) {
+    return <div className="text-center py-12">Loading projects...</div>;
+  }
+
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-6">Mission Control</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
-          <h3 className="text-gray-400 text-sm font-medium">Total Projects</h3>
-          <p className="text-4xl font-bold mt-2">12</p>
-        </div>
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
-          <h3 className="text-gray-400 text-sm font-medium">API Requests (24h)</h3>
-          <p className="text-4xl font-bold mt-2">1.2M</p>
-        </div>
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
-          <h3 className="text-gray-400 text-sm font-medium">Storage Used</h3>
-          <p className="text-4xl font-bold mt-2">45.2 GB</p>
-        </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Projects</h1>
+        <Button onClick={() => setShowCreate(!showCreate)}>
+          {showCreate ? 'Cancel' : 'New Project'}
+        </Button>
       </div>
-      <div className="mt-8">
-        <Link to="/login" className="text-blue-500 hover:underline">
-          Go to Login
-        </Link>
+
+      {showCreate && (
+        <div className="border border-border rounded-lg p-6 bg-card space-y-4">
+          <h2 className="text-xl font-semibold">Create New Project</h2>
+          <div className="flex gap-4">
+            <input
+              type="text"
+              value={newProjectName}
+              onChange={(e) => setNewProjectName(e.target.value)}
+              placeholder="Project name"
+              className="flex-1 px-4 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+              onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+            />
+            <Button onClick={handleCreate} disabled={createProject.isPending}>
+              {createProject.isPending ? 'Creating...' : 'Create'}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {projects?.map((project) => (
+          <div
+            key={project.id}
+            className="border border-border rounded-lg p-6 bg-card hover:border-primary transition-colors cursor-pointer"
+          >
+            <h3 className="text-lg font-semibold mb-2">{project.name}</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Role: <span className="capitalize">{project.role}</span>
+            </p>
+            <div className="text-xs text-muted-foreground">
+              {project.createdAt && new Date(project.createdAt).toLocaleDateString()}
+            </div>
+          </div>
+        ))}
       </div>
+
+      {projects?.length === 0 && !showCreate && (
+        <div className="text-center py-12 text-muted-foreground">
+          <p className="mb-4">No projects yet</p>
+          <Button onClick={() => setShowCreate(true)}>Create your first project</Button>
+        </div>
+      )}
     </div>
   );
 }
