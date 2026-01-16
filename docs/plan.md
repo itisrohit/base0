@@ -51,10 +51,12 @@ This project demonstrates:
 *   ✅ **S3 Storage Driver** - Implemented (Compatible with MinIO/R2)
 
 ### 5. Mission Control (Dashboard)
-*   🔄 Visual Data Explorer - Planned (Phase 3)
-*   🔄 User & Session Management - Planned
-*   🔄 Storage Browser - Planned
-*   🔄 Usage Telemetry - Planned
+*   ✅ **Projects & API Key Management** - Implemented
+*   ✅ **Schema Designer (Collections)** - Implemented
+*   ✅ **Visual Data Explorer (Documents)** - Implemented
+*   🔄 **User & Session Management UI** - Planned
+*   🔄 **Storage Browser UI** - Planned
+*   🔄 **Usage Telemetry UI** - Planned
 
 ---
 
@@ -201,10 +203,13 @@ This project demonstrates:
 *   ✅ **React 19 Dashboard setup**: Vite 6, Tailwind v4, Shadcn Integrated - Implemented
 *   ✅ **TanStack Router implementation**: File-based routing with code splitting - Implemented
 *   ✅ **Authentication Integration**: Magic Link and OAuth flow with protected routes - Implemented
+*   ✅ **Projects Management UI**: List and create projects with the role-based access - Implemented
 *   ✅ **API Key Management UI**: Create, view, and revoke API keys with scope control - Implemented
-*   ✅ **Projects Management UI**: List and create projects with role-based access - Implemented
 *   ✅ **Schema Designer**: Visual UI for designing collections and fields - Implemented
 *   ✅ **Visual Data Explorer**: Visual UI for CRUD operations on collection data - Implemented
+*   🔄 **User & Session Management UI**: View and manage active project members and sessions
+*   🔄 **Storage Browser UI**: File explorer for project storage buckets
+*   🔄 **Usage Telemetry UI**: Basic charts for API usage and storage consumption
 
 ### Phase 5: Refinement & QA (Next)
 *   OpenAPI / Swagger documentation auto-generation
