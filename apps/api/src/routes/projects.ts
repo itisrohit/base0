@@ -1,13 +1,14 @@
 import { db } from '@base0/db';
-import { projects } from '@base0/db/schema';
+import { projectMembers, projects } from '@base0/db/schema';
 import { zValidator } from '@hono/zod-validator';
 import { and, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
-import { authMiddleware, getAuthUser } from '../middleware/auth';
+import { authMiddleware, getAuthContext, getAuthUser } from '../middleware/auth';
+import type { AuthVariables } from '../types';
 
-const projectsRoute = new Hono();
+const projectsRoute = new Hono<{ Variables: AuthVariables }>();
 
 // Validation schemas
 const createProjectSchema = z.object({
@@ -41,20 +42,30 @@ projectsRoute.post('/', authMiddleware, zValidator('json', createProjectSchema),
   const { name, config } = c.req.valid('json');
 
   try {
-    const [newProject] = await db
-      .insert(projects)
-      .values({
-        id: `proj_${nanoid(12)}`,
-        name,
-        ownerId: userId,
-        config,
-      })
-      .returning();
+    const [project] = await db.transaction(async (tx) => {
+      const [newProject] = await tx
+        .insert(projects)
+        .values({
+          id: `proj_${nanoid(12)}`,
+          name,
+          ownerId: userId,
+          config,
+        })
+        .returning();
+
+      await tx.insert(projectMembers).values({
+        projectId: newProject.id,
+        userId: userId,
+        role: 'owner',
+      });
+
+      return [newProject];
+    });
 
     return c.json(
       {
         message: 'Project created successfully',
-        project: newProject,
+        project,
       },
       201,
     );
@@ -69,14 +80,25 @@ projectsRoute.post('/', authMiddleware, zValidator('json', createProjectSchema),
  * Get details of a specific project
  */
 projectsRoute.get('/:id', authMiddleware, async (c) => {
-  const { userId } = getAuthUser(c);
+  const auth = getAuthContext(c);
   const projectId = c.req.param('id');
 
   try {
+    // If API Key, check if it matches the requested project
+    if (auth.authType === 'apiKey') {
+      if (auth.projectId !== projectId) {
+        return c.json({ error: 'Unauthorized: API Key is not valid for this project' }, 403);
+      }
+    }
+
     const [project] = await db
       .select()
       .from(projects)
-      .where(and(eq(projects.id, projectId), eq(projects.ownerId, userId)))
+      .where(
+        auth.authType === 'apiKey'
+          ? eq(projects.id, projectId)
+          : and(eq(projects.id, projectId), eq(projects.ownerId, auth.userId ?? '')),
+      )
       .limit(1);
 
     if (!project) {

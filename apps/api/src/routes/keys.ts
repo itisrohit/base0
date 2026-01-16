@@ -3,11 +3,15 @@ import { apiKeys, projects } from '@base0/db/schema';
 import { zValidator } from '@hono/zod-validator';
 import { and, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { nanoid } from 'nanoid';
+import { customAlphabet } from 'nanoid';
 import { z } from 'zod';
 import { authMiddleware, getAuthUser } from '../middleware/auth';
+import type { AuthVariables } from '../types';
 
-const keysRoute = new Hono();
+const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const nanoid = customAlphabet(alphabet, 21);
+
+const keysRoute = new Hono<{ Variables: AuthVariables }>();
 
 // Validation schema for creating an API key
 const createKeySchema = z.object({
@@ -71,17 +75,18 @@ keysRoute.post('/', authMiddleware, zValidator('json', createKeySchema), async (
       return c.json({ error: 'Project not found or unauthorized' }, 404);
     }
 
-    // Generate a new raw key
-    const rawKey = `b0_${nanoid(32)}`;
+    // Generate a new API key pair
+    const keyId = nanoid(12); // Public ID for lookup
+    const secret = nanoid(32); // Secret part
+    const rawKey = `b0_${keyId}_${secret}`;
 
-    // In a real app, we would hash the key before storing
-    // For now, let's keep it simple but recognize the need for hashing in production
-    // Bun.password can be used for hashing if we treat it like a password
-    const keyHash = await Bun.password.hash(rawKey);
+    // Hash the secret part for storage
+    const keyHash = await Bun.password.hash(secret);
 
     const [newKey] = await db
       .insert(apiKeys)
       .values({
+        keyId,
         projectId,
         keyHash,
         scopes,
@@ -93,6 +98,7 @@ keysRoute.post('/', authMiddleware, zValidator('json', createKeySchema), async (
         message: 'API key created successfully. Store this safely, it will not be shown again.',
         apiKey: rawKey, // Show the raw key once
         id: newKey.id,
+        keyId: newKey.keyId,
         projectId: newKey.projectId,
         scopes: newKey.scopes,
       },
