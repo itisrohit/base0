@@ -1,4 +1,5 @@
 import { createRoute } from '@tanstack/react-router';
+import Cookies from 'js-cookie';
 import { useState } from 'react';
 import { rootRoute } from './__root';
 
@@ -13,9 +14,10 @@ function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [magicToken, setMagicToken] = useState<string | null>(null);
 
   const handleGitHubLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/login/github`;
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/auth/github`;
   };
 
   const handleMagicLink = async (e: React.FormEvent) => {
@@ -23,21 +25,42 @@ function LoginPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/magic-link', {
+      const res = await fetch('/api/v1/auth/magic-link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
       if (!res.ok) throw new Error('Failed to send magic link');
       const data = await res.json();
-      // For development, we might show the link or token?
-      // In prod, we just say "Check your email"
       setSuccess(true);
+      setMagicToken(data.token);
       console.log('Magic Link Data:', data); // Dev only
     } catch (_err) {
       setError('Failed to send magic link. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleVerifyMagicLink = async (token: string) => {
+    try {
+      const res = await fetch('/api/v1/auth/verify-magic-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      if (!res.ok) throw new Error('Failed to verify magic link');
+      const data = await res.json();
+
+      // Store the auth token
+      if (data.accessToken) {
+        Cookies.set('auth_token', data.accessToken, { expires: 7 }); // 7 days
+      }
+
+      // Redirect to dashboard
+      window.location.href = '/';
+    } catch (_err) {
+      setError('Failed to verify magic link. Please try again.');
     }
   };
 
@@ -50,8 +73,20 @@ function LoginPage() {
         </div>
 
         {success ? (
-          <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-lg text-green-500 text-center">
-            <p>Check your email for the magic link!</p>
+          <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-lg text-green-500 space-y-3">
+            <p className="text-center font-medium">Check your email for the magic link!</p>
+            {magicToken && (
+              <div className="mt-4 p-3 bg-gray-900 rounded border border-gray-800">
+                <p className="text-xs text-gray-400 mb-2">Development Mode - Click to verify:</p>
+                <button
+                  type="button"
+                  onClick={() => handleVerifyMagicLink(magicToken)}
+                  className="w-full text-left text-xs font-mono text-blue-400 hover:text-blue-300 break-all"
+                >
+                  {magicToken}
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <form onSubmit={handleMagicLink} className="space-y-4">
