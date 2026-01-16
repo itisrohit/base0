@@ -1,10 +1,11 @@
 import { db } from '@base0/db';
 import { collections, documents, projects } from '@base0/db/schema';
-import { and, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import type { Context, Next } from 'hono';
 import { Hono } from 'hono';
 import { createDynamicSchema, type SchemaDefinition } from '../lib/dynamic-validator';
-import { authMiddleware, getAuthUser } from '../middleware/auth';
+import { parseFilters, parsePagination } from '../lib/query-parser';
+import { authMiddleware, getAuthContext } from '../middleware/auth';
 import type { AuthVariables } from '../types';
 
 const documentsRoute = new Hono<{ Variables: AuthVariables }>();
@@ -13,25 +14,41 @@ const documentsRoute = new Hono<{ Variables: AuthVariables }>();
  * Middleware to check collection access via project ownership
  */
 const checkCollectionAccess = async (c: Context<{ Variables: AuthVariables }>, next: Next) => {
-  const { userId } = getAuthUser(c);
+  const auth = getAuthContext(c);
   const collectionId = c.req.param('collectionId');
 
   if (!collectionId) {
     return c.json({ error: 'Collection ID is required' }, 400);
   }
 
+  // Optimize: If it's an API Key, we can check collectionId belongs to auth.projectId
+  // For both cases, we can inner join with projects and check either ownerId or projectId
+
   const [result] = await db
     .select({
       collection: collections,
       ownerId: projects.ownerId,
+      projectId: projects.id,
     })
     .from(collections)
     .innerJoin(projects, eq(collections.projectId, projects.id))
-    .where(and(eq(collections.id, collectionId), eq(projects.ownerId, userId)))
+    .where(eq(collections.id, collectionId))
     .limit(1);
 
   if (!result) {
-    return c.json({ error: 'Collection not found or unauthorized' }, 404);
+    return c.json({ error: 'Collection not found' }, 404);
+  }
+
+  // Authorization check
+  if (auth.authType === 'apiKey') {
+    if (result.projectId !== auth.projectId) {
+      return c.json({ error: 'Unauthorized: API Key is not valid for this collection' }, 403);
+    }
+  } else {
+    // JWT User
+    if (result.ownerId !== auth.userId) {
+      return c.json({ error: 'Unauthorized: You do not own this collection' }, 403);
+    }
   }
 
   // Attach collection to variables
@@ -41,15 +58,42 @@ const checkCollectionAccess = async (c: Context<{ Variables: AuthVariables }>, n
 
 /**
  * GET /v1/collections/:collectionId/documents
- * List all documents in a collection
+ * List all documents in a collection with filtering and pagination
  */
 documentsRoute.get('/:collectionId/documents', authMiddleware, checkCollectionAccess, async (c) => {
   const collectionId = c.req.param('collectionId');
+  const query = c.req.query();
+
+  const filters = parseFilters(query);
+  const { limit, offset, sort, order } = parsePagination(query);
 
   try {
-    const docs = await db.select().from(documents).where(eq(documents.collectionId, collectionId));
+    const queryBuilder = db
+      .select()
+      .from(documents)
+      .where(and(eq(documents.collectionId, collectionId), filters))
+      .limit(limit ?? 25)
+      .offset(offset ?? 0);
 
-    return c.json({ documents: docs });
+    // Sorting logic
+    if (sort === 'createdAt') {
+      queryBuilder.orderBy(order === 'desc' ? desc(documents.createdAt) : asc(documents.createdAt));
+    } else if (sort) {
+      // Sort by JSONB field
+      const jsonSortField = sql`${documents.data} ->> ${sort} `;
+      queryBuilder.orderBy(order === 'desc' ? desc(jsonSortField) : asc(jsonSortField));
+    }
+
+    const docs = await queryBuilder;
+
+    return c.json({
+      documents: docs,
+      pagination: {
+        limit,
+        offset,
+        count: docs.length,
+      },
+    });
   } catch (error) {
     console.error('List documents error:', error);
     return c.json({ error: 'Failed to list documents' }, 500);
