@@ -1,0 +1,64 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Node modules and build outputs
+node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+.turbo
+dist
+build
+.next
+out
+
+# Dependencies cache
+.bun
+bun.lockb
+
+# IDE and editors
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment and config
+.env
+.env.local
+.env.*.local
+.eslintcache
+
+# Documentation
+*.md
+docs/
+README.md
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Testing
+*.test.ts
+*.spec.ts
+coverage
+.nyc_output
+
+# Misc
+.prettierignore
+.prettierrc
+biome.json
+tsconfig.json
+turbo.json

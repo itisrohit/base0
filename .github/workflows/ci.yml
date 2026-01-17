@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "feat/container-readiness"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      # Database URL for 'init-db' step (connecting to exposed docker port)
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/base0
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check Code Quality (Lint & Biome)
+        run: bun run check
+
+      - name: Type Check
+        run: bun run type-check
+
+      - name: Build
+        run: bun run build
+
+      - name: Start Infrastructure
+        run: |
+          docker compose up -d --build postgres api minio
+          
+          # Wait for API health check
+          echo "Waiting for API to be healthy..."
+          timeout 60s sh -c 'until curl -s http://localhost:3001/health | grep "OK"; do sleep 2; done'
+          echo "Infrastructure is ready!"
+
+      - name: Init Test Database
+        run: |
+          # The postgres container is exposed on 5432
+          cd packages/db
+          bun run db:push
+
+      - name: Run Tests
+        run: bun run test
+        env:
+          # Ensure tests target the local exposed port which maps to the container
+          API_URL: http://localhost:3001/v1

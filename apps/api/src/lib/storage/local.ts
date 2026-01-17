@@ -6,8 +6,10 @@ export class LocalStorageProvider implements StorageProvider {
   private baseDir: string;
 
   constructor() {
-    // Default to a folder in the root called 'dstore/uploads'
-    this.baseDir = join(process.cwd(), 'dstore', 'uploads');
+    // Correctly resolve baseDir based on environment
+    // In Docker: /app/uploads
+    // Local: ./uploads (relative to root)
+    this.baseDir = process.env.STORAGE_PATH || join(process.cwd(), 'uploads');
   }
 
   async upload(path: string, data: Buffer | Uint8Array, _mimeType: string): Promise<void> {

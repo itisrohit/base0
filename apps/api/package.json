@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "build": "bun build ./src/index.ts --outdir ./dist",
+    "build": "bun build ./src/index.ts --outdir ./dist --target bun",
     "type-check": "tsc --noEmit",
+    "test": "bun test",
     "start": "bun run src/index.ts"
   },
   "dependencies": {

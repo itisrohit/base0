@@ -1,96 +1,113 @@
-# Base0
+<p align="center">
+  <img src="assets/banner.png" alt="Base0 Banner" width="100%">
+</p>
 
-A high-performance, lightweight Backend-as-a-Service (BaaS) built for the edge-native era.
+<p align="center">
+  A minimal backend platform
+</p>
 
-Base0 provides essential backend primitives including authentication, collection-based data storage, and blob storage, all with a zero-trust architecture and type-safe developer experience.
+<p align="center">
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
+  </a>
+  <img src="https://img.shields.io/badge/runtime-Bun_v1.2-black.svg" alt="Bun">
+  <img src="https://img.shields.io/badge/lang-TypeScript-blue.svg" alt="TypeScript">
+  <img src="https://img.shields.io/badge/framework-Hono-orange.svg" alt="Hono">
+  <img src="https://img.shields.io/badge/frontend-React_19-cyan.svg" alt="React">
+</p>
+
+<hr />
+
+## Overview
+
+A lightweight backend platform providing authentication, document storage, file handling, and RBAC through a type-safe API and React-based control plane.
 
 ## Architecture
 
-Base0 is built as a monorepo leveraging Bun and Turborepo. It focuses on minimalist system design, using Web Standards (Request/Response) to ensure compatibility across various edge runtimes.
+The platform is engineered as a monorepo leveraging Bun and Turborepo. It prioritizes:
+- **Edge-native compatibility**: Designed to run efficiently on modern runtimes.
+- **Type Safety**: End-to-end typing shared between client and server.
+- **Minimalism**: Leveraging standard Web APIs (Request/Response) over heavy framework abstractions.
 
 ## Core Features
 
 ### Authentication
-- JWT-based session management with access and refresh tokens.
-- Secure password hashing using Argon2id.
-- Passwordless login via Magic Links.
-- Pluggable OAuth2 interface (GitHub/Google).
+- JWT-based session management with automatic access and refresh token rotation.
+- Secure, industry-standard password hashing using Argon2id.
+- Passwordless authentication flows using Magic Links.
+- Extensible OAuth2 interface supporting providers like GitHub and Google.
 
 ### Data Engine
-- Dynamic schema definition with runtime Zod validation.
-- Multi-tenant isolation through project-based logical separation.
-- Advanced querying using PostgreSQL JSONB.
+- Dynamic schema definitions utilizing runtime Zod validation.
+- Strict multi-tenant isolation via logical project separation.
+- Advanced querying capabilities leveraging PostgreSQL JSONB.
 
 ### Blob Storage
-- Pluggable driver architecture supporting Local and S3 (AWS/MinIO/R2) storage.
-- Secure upload and streaming download.
+- Pluggable driver architecture supporting Local filesystem and S3-compatible providers (AWS, MinIO, R2).
+- Secure, presigned upload mechanisms and streaming downloads.
+- Integrated file metadata tracking and management.
 
 ### Access Control
-- Granular Role-Based Access Control (Owner, Admin, Member, Viewer).
-- Project-scoped API keys with surgical scope enforcement.
-- Integrated rate limiting.
+- Granular Role-Based Access Control (RBAC) with Owner, Admin, Member, and Viewer roles.
+- Project-scoped API keys with precise permission enforcement.
+- Native rate limiting to prevent abuse.
 
 ## Technology Stack
 
-- **Server Runtime:** Bun v1.2+
-- **API Framework:** Hono
-- **Database:** PostgreSQL with Drizzle ORM
-- **Dashboard:** React 19, Vite 6, Tailwind CSS v4
-- **Routing:** TanStack Router
-- **State Management:** TanStack Query
-- **Tooling:** Turborepo, Biome
+- **Runtime**: Bun v1.2+
+- **API Framework**: Hono
+- **Database**: PostgreSQL (JSONB) with Drizzle ORM
+- **Dashboard**: React 19, Vite 6, Tailwind CSS v4
+- **Routing**: TanStack Router
+- **State Management**: TanStack Query
+- **Tooling**: Turborepo, Biome
 
 ## Getting Started
 
 ### Prerequisites
 
-- Bun v1.2 or higher
-- Docker (for local PostgreSQL)
+- **Bun**: v1.2 or higher
+- **Docker**: Required for local PostgreSQL instance
 
-### Setup
+### Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/itisrohit/base0.git
-   cd base0
-   ```
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/itisrohit/base0.git
+    cd base0
+    ```
 
-2. Install dependencies:
-   ```bash
-   bun install
-   ```
+2.  **Install dependencies**
+    ```bash
+    bun install
+    ```
 
-3. Configure environment:
-   ```bash
-   cp .env.example .env
-   ```
+3.  **Configure environment**
+    ```bash
+    cp .env.example .env
+    ```
 
-4. Initialize the database:
-   ```bash
-   docker compose up -d
-   cd packages/db
-   bun run db:push
-   cd ../..
-   ```
+4.  **Initialize infrastructure**
+    Start the database container and apply schema migrations:
+    ```bash
+    docker-compose up -d db
+    bun run db:push
+    ```
 
 ### Development
 
-To start the API and Dashboard simultaneously:
+To start the API and Dashboard simultaneously in development mode:
 
 ```bash
 bun run dev
 ```
 
-- API Server: `http://localhost:3001`
-- Dashboard: `http://localhost:3000`
+- **API Server**: http://localhost:3001
+- **Dashboard**: http://localhost:3000
 
-## Repository Structure
+## Contributing
 
-The project is organized into logical workspaces:
-
-- `apps/api`: The Hono-based core service.
-- `apps/dashboard`: The React-based administrative interface.
-- `packages/db`: Shared database schema and Drizzle configuration.
+Please review [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## License
 

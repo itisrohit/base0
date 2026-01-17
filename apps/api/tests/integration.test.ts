@@ -184,6 +184,11 @@ describe('Base0 Integration Tests', () => {
       },
       body: formData,
     });
+
+    if (res.status !== 201) {
+      console.log('Upload failed:', res.status, await res.text());
+    }
+
     const data = await res.json();
     expect(res.status).toBe(201);
     fileId = data.file.id;

@@ -69,7 +69,7 @@ export const rateLimit = (config: RateLimitConfig) => {
  */
 export const standardRateLimit = rateLimit({
   windowMs: 60 * 1000,
-  max: 500,
+  max: parseInt(process.env.RATE_LIMIT_MAX || '500', 10),
   keyGenerator: (c) => {
     // Try to limit by API Key or User ID if authenticated, else IP
     const variables = c as unknown as { Var: { auth: { keyId?: string; userId?: string } } };
