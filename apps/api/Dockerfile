@@ -67,6 +67,9 @@ COPY --from=builder --chown=bun-nodejs:bun-nodejs /app/apps/api/package.json ./p
 COPY --from=deps --chown=bun-nodejs:bun-nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=bun-nodejs:bun-nodejs /app/packages/db ./packages/db
 
+# Create uploads directory with correct permissions
+RUN mkdir -p /app/uploads && chown bun-nodejs:bun-nodejs /app/uploads
+
 # Set proper permissions and switch to non-root user
 USER bun-nodejs
 
