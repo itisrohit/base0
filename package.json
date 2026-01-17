@@ -11,6 +11,8 @@
     "test": "turbo run test",
     "check": "biome check .",
     "check:apply": "biome check --write .",
+    "db:push": "bun run --filter @base0/db db:push",
+    "db:studio": "bun run --filter @base0/db db:studio",
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
