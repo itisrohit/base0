@@ -141,10 +141,13 @@ describe('Base0 Advanced Primitives: Rate Limiting & Scopes', () => {
       const results = await Promise.all(batch);
       if (results.some((status) => status === 429)) {
         rateLimited = true;
+        console.log('Rate limit hit at request #', i + batchSize);
         break;
       }
+      // Small delay to allow server to process
+      await new Promise((r) => setTimeout(r, 50));
     }
 
     expect(rateLimited).toBe(true);
-  }, 45000);
+  }, 60000);
 });

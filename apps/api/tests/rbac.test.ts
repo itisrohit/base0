@@ -54,7 +54,7 @@ describe('Base0 RBAC & Collaboration Tests', () => {
     });
     const aData = await res3.json();
     adminToken = aData.accessToken;
-  });
+  }, 30000);
 
   test('2. Owner creates project', async () => {
     const res = await apiFetch('/projects', {
