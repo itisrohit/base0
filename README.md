@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  Base0 — Minimal Backend Platform
+  A minimal backend platform
 </p>
 
 <p align="center">
@@ -20,7 +20,7 @@
 
 ## Overview
 
-Designed and implemented a lightweight BaaS providing authentication, document storage, file handling, and RBAC with a type-safe API and React-based control plane.
+A lightweight backend platform providing authentication, document storage, file handling, and RBAC through a type-safe API and React-based control plane.
 
 ## Architecture
 
@@ -56,7 +56,7 @@ The platform is engineered as a monorepo leveraging Bun and Turborepo. It priori
 
 - **Runtime**: Bun v1.2+
 - **API Framework**: Hono
-- **Database**: PostgreSQL with Drizzle ORM
+- **Database**: PostgreSQL (JSONB) with Drizzle ORM
 - **Dashboard**: React 19, Vite 6, Tailwind CSS v4
 - **Routing**: TanStack Router
 - **State Management**: TanStack Query
