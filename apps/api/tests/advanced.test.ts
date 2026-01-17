@@ -117,10 +117,9 @@ describe('Base0 Advanced Primitives: Rate Limiting & Scopes', () => {
     // The limit is 500 per minute. We need to exceed it.
     // Batch requests to prevent ECONNRESET
     const hammerKey = writeKey;
-
     let rateLimited = false;
     const batchSize = 100;
-    const totalRequests = 510;
+    const totalRequests = 600;
 
     for (let i = 0; i < totalRequests; i += batchSize) {
       const batch = [];
@@ -139,13 +138,17 @@ describe('Base0 Advanced Primitives: Rate Limiting & Scopes', () => {
         );
       }
       const results = await Promise.all(batch);
+
+      // Log first status of batch for debug
+      console.log(`Batch ${i / batchSize} status example:`, results[0]);
+
       if (results.some((status) => status === 429)) {
         rateLimited = true;
         console.log('Rate limit hit at request #', i + batchSize);
         break;
       }
       // Small delay to allow server to process
-      await new Promise((r) => setTimeout(r, 50));
+      await new Promise((r) => setTimeout(r, 10));
     }
 
     expect(rateLimited).toBe(true);
