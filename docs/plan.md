@@ -126,7 +126,7 @@ Full schema definition available in `packages/db/schema.ts`.
   - Auth routes: signup, login, refresh, me
   - Zod validation for all inputs
 
-### Phase 3: Extended Primitives ✅ COMPLETED (Core)
+### Phase 2: Extended Primitives ✅ COMPLETED (Core)
 *   ✅ **Unified Auth Middleware**: Support for both JWT (User Sessions) and API Keys (b0_...) - Implemented
 *   ✅ **Document Filtering Engine**: Advanced JSONB querying with operators (`eq`, `gt`, `contains`, `in`, etc.) - Implemented
 *   ✅ **Blob Storage System**: Plug-and-play storage architecture with Local driver support - Implemented
@@ -139,7 +139,7 @@ Full schema definition available in `packages/db/schema.ts`.
 *   ✅ **S3 Storage Driver**: AWS S3/Minio compatibility layer - Implemented
 *   ✅ **Rate Limiting**: Base computational metering per project/key - Implemented
 
-### Phase 3.5: Advanced Authentication ✅ COMPLETED
+### Phase 3: Advanced Authentication ✅ COMPLETED
 *   ✅ **Magic Link / Passwordless**: Secure email-based login (Arctic + Custom Table) - Implemented
 *   ✅ **OIDC / OAuth2 Pluggable Interface**: GitHub/Google login flow (Arctic) - Implemented
 
