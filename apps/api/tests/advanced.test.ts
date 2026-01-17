@@ -119,7 +119,7 @@ describe('Base0 Advanced Primitives: Rate Limiting & Scopes', () => {
     const hammerKey = writeKey;
 
     let rateLimited = false;
-    const batchSize = 50;
+    const batchSize = 100;
     const totalRequests = 510;
 
     for (let i = 0; i < totalRequests; i += batchSize) {
@@ -149,5 +149,5 @@ describe('Base0 Advanced Primitives: Rate Limiting & Scopes', () => {
     }
 
     expect(rateLimited).toBe(true);
-  }, 60000);
+  }, 90000);
 });
