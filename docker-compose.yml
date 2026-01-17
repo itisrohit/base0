@@ -94,10 +94,11 @@ services:
       S3_FORCE_PATH_STYLE: "true"
       GITHUB_CLIENT_ID: ""
       GITHUB_CLIENT_SECRET: ""
+      RATE_LIMIT_MAX: 100
     ports:
       - "3001:3001"
     volumes:
-      - uploads_data:/app/uploads
+      # - uploads_data:/app/uploads
     networks:
       - base0-network
     restart: unless-stopped

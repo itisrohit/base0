@@ -118,8 +118,9 @@ describe('Base0 Advanced Primitives: Rate Limiting & Scopes', () => {
     // Batch requests to prevent ECONNRESET
     const hammerKey = writeKey;
     let rateLimited = false;
-    const batchSize = 100;
-    const totalRequests = 600;
+    const batchSize = 20;
+    // Limit is 100 in docker-compose, so 150 should effectively trigger it
+    const totalRequests = 150;
 
     for (let i = 0; i < totalRequests; i += batchSize) {
       const batch = [];
@@ -140,7 +141,7 @@ describe('Base0 Advanced Primitives: Rate Limiting & Scopes', () => {
       const results = await Promise.all(batch);
 
       // Log first status of batch for debug
-      console.log(`Batch ${i / batchSize} status example:`, results[0]);
+      console.log(`Batch request #${i} status:`, results[0]);
 
       if (results.some((status) => status === 429)) {
         rateLimited = true;
@@ -152,5 +153,5 @@ describe('Base0 Advanced Primitives: Rate Limiting & Scopes', () => {
     }
 
     expect(rateLimited).toBe(true);
-  }, 90000);
+  }, 30000);
 });
