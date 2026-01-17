@@ -97,8 +97,6 @@ services:
       RATE_LIMIT_MAX: 100
     ports:
       - "3001:3001"
-    volumes:
-      # - uploads_data:/app/uploads
     networks:
       - base0-network
     restart: unless-stopped
