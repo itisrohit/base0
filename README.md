@@ -22,6 +22,10 @@
 
 A lightweight backend platform providing authentication, document storage, file handling, and RBAC through a type-safe API and React-based control plane.
 
+<p align="center">
+  <img src="assets/demo.png" alt="Base0 Dashboard Preview" width="100%">
+</p>
+
 ## Architecture
 
 The platform is engineered as a monorepo leveraging Bun and Turborepo. It prioritizes:
