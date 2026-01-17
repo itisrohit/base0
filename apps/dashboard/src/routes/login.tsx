@@ -1,6 +1,6 @@
 import { createRoute } from '@tanstack/react-router';
 import Cookies from 'js-cookie';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { rootRoute } from './__root';
 
 export const loginRoute = createRoute({
@@ -16,6 +16,13 @@ function LoginPage() {
   const [success, setSuccess] = useState(false);
   const [magicToken, setMagicToken] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = Cookies.get('auth_token');
+    if (token) {
+      window.location.href = '/';
+    }
+  }, []);
 
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
