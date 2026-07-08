@@ -56,16 +56,6 @@ The platform is engineered as a monorepo leveraging Bun and Turborepo. It priori
 - Project-scoped API keys with precise permission enforcement.
 - Native rate limiting to prevent abuse.
 
-## Technology Stack
-
-- **Runtime**: Bun v1.2+
-- **API Framework**: Hono
-- **Database**: PostgreSQL (JSONB) with Drizzle ORM
-- **Dashboard**: React 19, Vite 6, Tailwind CSS v4
-- **Routing**: TanStack Router
-- **State Management**: TanStack Query
-- **Tooling**: Turborepo, Biome
-
 ## Getting Started
 
 ### Prerequisites
@@ -108,6 +98,51 @@ bun run dev
 
 - **API Server**: http://localhost:3001
 - **Dashboard**: http://localhost:3000
+
+## REST API
+
+Base0 is a pure REST API — no SDK required. Use any HTTP client (`curl`, `fetch`, `axios`) to interact with it.
+
+### API Key (Programmatic Access)
+
+This is the primary way to use Base0 from your apps. Create an API key in the Dashboard (or via JWT), then use it directly:
+
+```bash
+KEY="b0_<keyId>_<secret>"
+PROJ="proj_..."
+
+# Create a collection
+curl -X POST http://localhost:3001/v1/projects/$PROJ/collections \
+  -H "X-API-Key: $KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"tasks","schemaDef":{"fields":[{"name":"title","type":"string","required":true}]}}'
+
+# Insert a document
+curl -X POST http://localhost:3001/v1/projects/$PROJ/collections/<COL_ID>/documents \
+  -H "X-API-Key: $KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"data":{"title":"Hello"}}'
+
+# Query with filters
+curl "http://localhost:3001/v1/projects/$PROJ/collections/<COL_ID>/documents?title[contains]=Hello&sort=createdAt" \
+  -H "X-API-Key: $KEY"
+```
+
+The API key is scoped to a specific project. With it you can manage collections, documents, storage, members, and read usage telemetry. **[Full API reference →](docs/api.md)**
+
+### JWT (User Sessions)
+
+Use for auth flows and project management (signup, login, create/delete projects, manage API keys):
+
+```bash
+# Sign up
+curl -X POST http://localhost:3001/v1/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"password123"}'
+
+# Use the returned token
+curl -H "Authorization: Bearer <token>" http://localhost:3001/v1/projects
+```
 
 ## Contributing
 
